@@ -1,0 +1,48 @@
+import { Review } from '../types/review';
+
+export const DUMMY_REVIEWS: Review[] = [
+  {
+    id: 'rev-1',
+    customerName: 'Nabila Putri',
+    city: 'Pondok Indah, Jakarta',
+    rating: 5,
+    comment: 'Keren banget MapahJastip! Titip skincare Rohto & Biore 12 pcs, semuanya dapet struk kasir asli Donki Shibuya. Bubble wrap tebel bgt anti penyok!',
+    verified: true,
+    itemPurchased: 'Rohto Melano CC & Biore UV (12 Pcs)',
+    receiptProof: true,
+    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBqt7lJrjGQdUbIhA7FzFKqYZkXO_erhyYaXjvIz9aJlhnofFQ9yyEqTJRg1I7hQ4JM8WiUDKMBJRNeDcBc07lA7FCJNJA0sfYsmIYZVUrHQzq_9OOlW-rzvERWQgE0pT3tYnu7XeMNPyJ9hpkZriHTeW-tUG_93t1TV496sYNuR_HpM3k_f5opN7Moa5lx-Goc1XJE1NWUddxoCUkso2BjlMAeRhHAimscMDDLLusGf6xSSR4N8C6K',
+  },
+  {
+    id: 'rev-2',
+    customerName: 'Bambang Wicaksono',
+    city: 'Gubeng, Surabaya',
+    rating: 5,
+    comment: 'Bantu hunting Onitsuka Nippon Made ukuran langka di store Ginza. Live video call pas di kasir, kurs transparan beneran sesuai kesepakatan awal.',
+    verified: true,
+    itemPurchased: 'Onitsuka Tiger Mexico 66 Nippon Made',
+    receiptProof: true,
+    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB6z96JmQoRuMkxvFY2kv9ZCeVeECdRBomxJxL0_UfiVj4ebKvP5JZM0BOInlMYdmQZHaOVIVAYOFdTNlkr6QbmDiiApoNOtuS8YeW1NFceLQ1GDy5FxLsvyL0L-X14hA660GRdbi10muELmyOnpxqfNA2MKXsGGp51Wwif6b4dMlsUr9ukOhjsHRoZbfH3AFmBIzGpdWNUfxvBLOA9YBOjr1pvUp4CmRIwiv_RQPEItZhIpZXRZB0Q',
+  },
+  {
+    id: 'rev-3',
+    customerName: 'Fajar Ramadhan',
+    city: 'Dago, Bandung',
+    rating: 5,
+    comment: 'Kolektor figure paham susahnya cari box mulus no damage. MapahJastip kasih corner box guard jadi kardus figur aman 100% mulus tanpa penyok.',
+    verified: true,
+    itemPurchased: 'Jujutsu Kaisen Figure Jump Shop',
+    receiptProof: true,
+    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDz24790W_AVAWJPkCbZyRtLhaRW7I2fZ3vNl6lbuXRAAo7hr0AiksrQpI3RJoJrUqbFKcRJKncb3k8UgqJ7nacFfp3KHPmvsbfe6DaAO1DdkChXw3BkCsLibG835eBbVafa_BEqWkeD95VoOcyQ7PANlUjBmaGnx7nFAdlMClcpfNuVkCwaXtLVzwvglQSzYiySthmOQWgTnuQcRTof67Fch3QXRH8YabvwZ0PT8ebCmH1Fb-jYb9i',
+  },
+  {
+    id: 'rev-4',
+    customerName: 'dr. Jessica Tan',
+    city: 'Medan Petisah, Medan',
+    rating: 5,
+    comment: 'Titip Shiroi Koibito & Uji Matcha cookies buat oleh-oleh kantor. Expire datenya fresh banget karena dibeli pas hari mau take-off dari Tokyo.',
+    verified: true,
+    itemPurchased: 'Shiroi Koibito & Uji Matcha Souvenir',
+    receiptProof: true,
+    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC4lfJU2aFsekhcSUyUU9vzzBfRXVvBHs7ib7np4W-6OLsKJXwowXdZFc3n9SNzzA-HUq62VGWQSxDzX0iMnVZHC3NavbT0mAPARSgBupyCTTOUIKp28CFkTiribQ7AsVH6WHtFZcKhAJ-sgX9Fjb14E54_T2A669MEN6dGVtNaW3_Ai0sPgAd0UFl8eqonxwRwKPlsi5PWxc-nGh2LAYMeSi-B-jg6rvH-oEmph9UpTSjwe9Q1i3Rn',
+  },
+];

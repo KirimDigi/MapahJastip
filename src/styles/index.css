@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Google Material Symbols Font Style */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+:root {
+  --surface: 249 249 255;
+  --on-surface: 0 27 62;
+  --surface-container-low: 241 243 255;
+  --surface-container-lowest: 255 255 255;
+  --surface-container: 232 238 255;
+  --surface-container-high: 223 232 255;
+  --surface-container-highest: 215 227 255;
+  --surface-light-blue: 234 247 255;
+  --surface-soft-blue: 244 250 255;
+  --border-subtle: 220 234 245;
+  --text-secondary: 96 112 138;
+  --on-surface-variant: 64 71 82;
+  --background: 249 249 255;
+  --on-background: 0 27 62;
+  --primary: 0 94 164;
+  --primary-container: 8 119 204;
+  --tertiary: 0 101 121;
+  --success-bg: 230 247 241;
+  --success-text: 15 127 88;
+  --warning-bg: 254 244 224;
+  --warning-text: 138 90 0;
+  --error-bg: 252 235 235;
+  --error-text: 194 59 59;
+}
+
+.dark,
+html.dark,
+body.dark {
+  --surface: 15 23 42; /* slate-900 */
+  --on-surface: 241 245 249; /* slate-100 */
+  --surface-container-low: 21 32 54; /* slate-850 */
+  --surface-container-lowest: 30 41 68; /* card bg slate-800 */
+  --surface-container: 36 50 82;
+  --surface-container-high: 44 60 98;
+  --surface-container-highest: 54 73 118;
+  --surface-light-blue: 26 46 80;
+  --surface-soft-blue: 20 34 60;
+  --border-subtle: 51 65 85; /* slate-700 */
+  --text-secondary: 148 163 184; /* slate-400 */
+  --on-surface-variant: 203 213 225; /* slate-300 */
+  --background: 15 23 42;
+  --on-background: 241 245 249;
+  --primary: 14 165 233; /* sky-500 luminous */
+  --primary-container: 2 132 199; /* sky-600 */
+  --tertiary: 56 189 248; /* sky-400 */
+  --success-bg: 6 78 59; /* emerald-900 */
+  --success-text: 52 211 153; /* emerald-400 */
+  --warning-bg: 120 53 15; /* amber-900 */
+  --warning-text: 251 191 36; /* amber-400 */
+  --error-bg: 127 29 29; /* red-900 */
+  --error-text: 248 113 113; /* red-400 */
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  body {
+    background-color: rgb(var(--surface));
+    color: rgb(var(--on-surface));
+    overflow-x: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  /* Numeric price formatting with tabular numbers */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgb(var(--surface-container-low));
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border-subtle));
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--primary));
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
