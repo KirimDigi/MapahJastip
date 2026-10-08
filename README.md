@@ -1,32 +1,30 @@
-# React + TypeScript + Vite
+# MapahJastip.id 🇯🇵✈️🇮🇩
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Platform Jasa Titip (Jastip) Hand-carry & Live Shopping dari Jepang ke Indonesia terpercaya.
 
-Currently, two official plugins are available:
+## 🚀 Fitur Utama
+- **Live Shopping Status & Ticker**: Informasi jadwal batch penerbangan dan live hunting shopper di Tokyo (Ginza, Shinjuku, Akihabara).
+- **Katalog Produk Jepang**: Filter multi-kategori (Skincare & Beauty, Makanan & Minuman, Vitamin & Farmasi, Fashion, Anime, dll).
+- **Kalkulator Biaya Jastip Transparan**: Hitung kurs JPY live, fee jastip, estimasi berat, dan total harga IDR tanpa biaya tersembunyi.
+- **Keranjang & Checkout WhatsApp Otomatis**: Integrasi format order WhatsApp instan.
+- **Tracking Status Pesanan**: Pantau batch pengiriman dari bandara Tokyo hingga sampai di Indonesia.
+- **Mode Terang & Gelap (Dark Mode)**: Tampilan responsif di semua ukuran layar (Mobile & Desktop).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠️ Teknologi
+- **Framework**: React 19 + TypeScript + Vite
+- **Styling**: Tailwind CSS
+- **Routing**: React Router DOM
+- **Icons**: Google Material Symbols Outlined
 
-## React Compiler
+## 💻 Cara Menjalankan Lokal
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+# Install dependensi
+npm install
 
-## Expanding the Oxlint configuration
+# Jalankan server development
+npm run dev
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+# Build untuk produksi
+npm run build
 ```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
