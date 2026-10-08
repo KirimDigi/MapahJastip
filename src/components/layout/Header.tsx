@@ -203,23 +203,6 @@ export const Header: React.FC = () => {
             )}
           </button>
 
-          {/* Shopper Consultation WhatsApp CTA (Links to WhatsApp 081280905425) */}
-          <a
-            href="https://wa.me/6281280905425?text=Halo%20Personal%20Shopper%20MapahJastip!%20Saya%20mau%20konsultasi%20titip%20belanja%20produk%20dari%20Jepang."
-            target="_blank"
-            rel="noreferrer"
-            title="Chat WhatsApp Shopper (0812-8090-5425)"
-            aria-label="Hubungi Shopper via WhatsApp 081280905425"
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-primary hover:bg-primary-dark text-white rounded-full shadow-[0_2px_10px_rgba(8,119,204,0.3)] transition-all transform hover:-translate-y-0.5 shrink-0 cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-[19px] shrink-0">support_agent</span>
-            <span className="text-xs font-bold whitespace-nowrap hidden 2xl:inline">
-              Hubungi Shopper
-            </span>
-            <span className="text-xs font-bold whitespace-nowrap hidden sm:inline 2xl:hidden">
-              WA Shopper
-            </span>
-          </a>
 
           {/* Profile Avatar / User status */}
           <div className="hidden md:flex items-center pl-0.5">
