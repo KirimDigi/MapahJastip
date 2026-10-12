@@ -1,166 +1,205 @@
-# PANDUAN PRESENTASI & LAPORAN PROYEK MAPAHJASTIP.ID
+# PANDUAN LENGKAP PRESENTASI & LAPORAN PROYEK MAPAHJASTIP.ID
 > **Dokumen Resmi untuk Presentasi ke Klien / Pemilik Usaha MapahJastip.id**  
-> *Versi: 1.0 — Soft Launch Ready (~92% Selesai)*  
+> *Versi: 2.0 (Lengkap & Terstruktur)*  
 > *Tanggal: 12 Oktober 2026*  
 > *URL Demo Live: [https://kirimdigi.github.io/MapahJastip/](https://kirimdigi.github.io/MapahJastip/)*
 
 ---
 
-## 📊 1. RINGKASAN KESIAPAN PROYEK (PERSENTASE: 92%)
+## 📊 1. TINGKAT KESIAPAN WEBSITE (ESTIMASI: ~92%)
 
-Website **MapahJastip.id** saat ini telah mencapai tahap **Soft Launch (Siap Uji Publik)** dengan tingkat kesiapan sistem mencapai **~92%**. Seluruh alur utama bisnis (*core business flow*) dari hulu ke hilir sudah beroperasi dan terintegrasi langsung dengan database Cloud Supabase.
+Website **MapahJastip.id** saat ini telah siap di tahap **Soft Launch (Siap Uji Publik)** dengan persentase kesiapan mencapai **~92%**.  
+Seluruh alur utama bisnis (*core business flow*) mulai dari pemilihan barang, kalkulator yen, checkout, login akun, hingga pelacakan resi 4 tahap dan dashboard admin sudah **100% aktif dan terhubung ke Database Cloud Supabase**.
 
-### Tabel Rincian Progres per Modul
+### Tabel Status Kesiapan per Modul
 
-| Modul / Komponen Sistem | Persentase | Status Teknis |
+| Modul / Komponen Sistem | Kesiapan | Status Operasional |
 | :--- | :---: | :--- |
-| **Desain Antarmuka (UI/UX) & Mobile Experience** | **100%** | Desain premium modern bertema Jepang, cepat, dan responsif di Android/iPhone |
-| **Katalog Produk & Sistem Keranjang Belanja** | **100%** | Fitur pencarian instan, filter kategori, hitung berat (gram) otomatis |
-| **Kalkulator Biaya Transparan (Yen ➔ Rupiah)** | **100%** | Konversi kurs yen live, hitung ongkir kargo per 100g, dan estimasi cukai |
-| **Sistem Autentikasi Pengguna (Login & Register)** | **95%** | Terhubung ke tabel `app_users` Supabase Cloud dengan isolasi data akun |
-| **Lacak Resi Kargo & Manual Tracking 4 Tahap** | **95%** | Sinkronisasi dua arah pelanggan & admin (Japan Post EMS, Paxel, JNE) |
-| **Dashboard / Portal Admin (`/admin`)** | **92%** | Proteksi PIN admin, kelola pesanan, update status, input resi, hapus data cloud |
-| **Integrasi Database Cloud (Supabase Realtime)** | **90%** | Penyimpanan terpusat data akun dan pesanan pelanggan secara realtime |
-| **Otomatisasi Payment Gateway Bank** | **70%** | Siap pakai via Transfer BCA & QRIS (Pengembangan lanjutan: webhook otomatis) |
+| **Desain Antarmuka (UI/UX) & Tampilan Mobile** | **100%** | Selesai (Desain premium ala Jepang, cepat, responsif di Android & iPhone) |
+| **Katalog Produk & Sistem Keranjang Belanja** | **100%** | Selesai (Pencarian cepat, filter kategori, hitung berat gram otomatis) |
+| **Kalkulator Biaya Transparan (Yen ➔ Rupiah)** | **100%** | Selesai (Kurs live yen, fee jastip, ongkir kargo per 100g, pajak cukai) |
+| **Sistem Autentikasi Akun (Login & Daftar)** | **95%** | Selesai (Tersimpan aman di Cloud Database Supabase dengan isolasi privasi) |
+| **Pelacakan Resi Kargo 4 Tahap (Manual Tracking)**| **95%** | Selesai (Sinkronisasi status antara HP pembeli & Dashboard Admin) |
+| **Portal / Dashboard Khusus Admin (`/admin`)** | **92%** | Selesai (PIN admin, kontrol status pesanan, input resi, hapus data cloud) |
+| **Penyimpanan Cloud Database (Supabase Realtime)**| **90%** | Selesai (Tabel `orders` dan `app_users` aktif online) |
+| **Otomatisasi Payment Gateway Perbankan** | **70%** | Siap pakai via Transfer Manual BCA & QRIS (Belum mutasi otomatis via API bank) |
 
 ---
 
-## 🧭 2. PENJELASAN SETIAP MENU & HALAMAN WEBSITE
+## 🧭 2. PENJELASAN LENGKAP SETIAP MENU WEBSITE
 
-### 1. Bar Navigasi & Header Atas
-* **Fungsi:** Menyajikan transparansi dan kredibilitas bisnis sejak detik pertama pengunjung membuka website.
-* **Fitur Utama:**
-  * **Kurs Acuan Live (1 JPY = Rp ...)**: Menampilkan kurs tukar secara terbuka sehingga pelanggan yakin tidak ada manipulasi harga tersembunyi.
-  * **Badge 100% Struk Resmi Asli**: Jaminan bahwa barang dibeli langsung dari toko resmi di Tokyo, Jepang.
-  * **Pengalih Bahasa (Indonesia / Jepang)**: Memberikan kesan platform profesional lintas negara.
-  * **Keranjang Belanja Mengambang (Drawer)**: Menghitung total harga dan estimasi total berat barang secara otomatis.
-  * **Status Akun Pelanggan**: Menampilkan nama akun pembeli (misal: Budi Pratama) saat login dan menu masuk/daftar.
+### 1. **Header & Bar Navigasi Atas**
+* **Fungsi:** Bagian atas yang selalu terlihat di semua halaman untuk membangun kepercayaan awal pengunjung.
+* **Fitur yang Tersedia:**
+  * **Kurs Acuan Live (1 JPY = Rp ...)**: Menampilkan kurs harian secara transparan agar pembeli yakin harga yang diberikan jujur tanpa mark-up liar.
+  * **Badge 100% Struk Resmi Asli**: Jaminan legalitas bahwa barang dibeli langsung di toko resmi Tokyo, Jepang.
+  * **Pengalih Bahasa (Indonesia / Jepang)** & **Mode Terang/Gelap (Light/Dark)**: Menambah kenyamanan pengalaman pengguna.
+  * **Keranjang Belanja Mengambang (Drawer)**: Menghitung total biaya belanjaan dan total berat barang (gram) secara otomatis.
+  * **Status Akun Pelanggan**: Menampilkan nama akun pembeli (misal: Budi Pratama) saat login, tombol profil, dan opsi keluar.
 
 ---
 
-### 2. Halaman Beranda (Home Page — `/`)
-* **Fungsi:** Etalase utama untuk mengubah pengunjung menjadi pembeli (*conversion focused*).
-* **Fitur Utama:**
-  * **Hero Banner Interaktif Tokyo**: Banner visual berkualitas tinggi dengan tombol pintas *"Titip Sekarang"* yang langsung mengarahkan ke WhatsApp Customer Service.
-  * **7 Kartu Kategori Populer**: Akses cepat 1-klik untuk:
-    1. *Skincare & Beauty* (Shiseido, Rohto Melano CC, SK-II, Hada Labo)
+### 2. **Halaman Beranda (Home Page — `/`)**
+* **Fungsi:** Etalase utama untuk menarik minat pembeli dan menjelaskan layanan dalam hitungan detik.
+* **Fitur yang Tersedia:**
+  * **Banner Tokyo Interaktif:** Dilengkapi tombol *"Titip Sekarang"* yang langsung menghubungkan pembeli ke WhatsApp resmi.
+  * **7 Kartu Kategori Unggulan:** Akses cepat 1-klik untuk:
+    1. *Skincare & Beauty* (Shiseido, Melano CC, SK-II, Hada Labo)
     2. *Makanan & Minuman* (Tokyo Banana, Royce Chocolate, KitKat Matcha)
     3. *Fashion & Brand* (Onitsuka Tiger, Bape, Uniqlo Japan, Issey Miyake)
     4. *Elektronik* (Nintendo Switch, Sony Headphones, Kamera)
-    5. *Jepang Character* (Pokemon Center, Sanrio, Ghibli Studio, Pop Mart)
-    6. *Vitamin & Obat Kesehatan* (DHC Supplement, Rohto Eye Drops, Koyok Salonpas)
-    7. *Lainnya / Request Khusus* (Form titipan link barang di luar katalog)
-  * **Omotenashi Flow (Alur Titip Belanja)**: Infografis 4 langkah mudah: *Pilih Barang ➔ Verifikasi Biaya ➔ Pembelian di Tokyo ➔ Kirim Sampai Rumah*.
-  * **Pratinjau Jadwal Kloter Penerbangan**: Menampilkan sisa kuota bagasi (kg) yang memicu pelanggan segera memesan sebelum slot bagasi habis (*urgensi FOMO*).
+    5. *Jepang Character* (Pokemon Center, Sanrio, Ghibli, Pop Mart)
+    6. *Vitamin & Kesehatan* (DHC Supplement, Rohto Eye Drops, Salonpas)
+    7. *Lainnya* (Formulir titipan barang khusus di luar katalog)
+  * **Alur Belanja (Omotenashi Flow):** Panduan 4 tahap mudah: *Pilih Barang ➔ Verifikasi Biaya ➔ Belanja di Tokyo ➔ Pengemasan Standar Kargo ➔ Kirim Sampai Rumah*.
+  * **Pratinjau Kuota Bagasi:** Menampilkan sisa kuota bagasi (kg) agar pelanggan terdorong segera order sebelum kuota penuh (*urgensi FOMO*).
 
 ---
 
-### 3. Menu Katalog Produk (`/katalog`)
-* **Fungsi:** Pusat eksplorasi produk Jepang siap titip.
-* **Fitur Utama:**
-  * **Pencarian Cepat (*Instant Search*)**: Hasil pencarian muncul seketika tanpa perlu memuat ulang halaman.
-  * **Filter Kategori Dinamis**: Pemfilteran mudah dengan tombol kategori ramah layar sentuh ponsel.
-  * **Modal Detail Barang**: Menampilkan berat produk, estimasi harga dalam Rupiah dan Yen, serta tombol *"Tambah ke Keranjang"*.
-  * **Request Barang di Luar Katalog**: Tombol khusus bagi pembeli yang ingin menitip barang langka yang belum ada di katalog website.
+### 3. **Menu Produk / Katalog (`/katalog`)**
+* **Fungsi:** Tempat pembeli mencari barang rekomendasi Jepang yang siap dipesan.
+* **Fitur yang Tersedia:**
+  * **Pencarian Cepat (*Live Search*)**: Hasil pencarian muncul seketika tanpa memuat ulang halaman.
+  * **Filter Kategori Cepat**: Filter berbasis tombol pills ramah layar sentuh HP.
+  * **Modal Detail Produk**: Menampilkan rincian berat barang, harga estimasi Rupiah & Yen, serta tombol *"Tambah ke Keranjang"*.
+  * **Tombol *"Request Barang di Luar Katalog"***: Membuka formulir titip barang khusus untuk produk langka yang belum ada di etalase.
 
 ---
 
-### 4. Menu Jadwal Penerbangan (`/jadwal-penerbangan`)
-* **Fungsi:** Memberikan kepastian jadwal belanja dan waktu keberangkatan bagasi shopper.
-* **Fitur Utama:**
-  * Menampilkan informasi maskapai terpercaya (ANA - All Nippon Airways, JAL - Japan Airlines, Garuda Indonesia).
-  * Menampilkan rute penerbangan resmi (Haneda/Narita Tokyo ➔ Soekarno-Hatta Jakarta).
-  * Batas waktu setor titipan (*Cut-Off Order Date*) dan estimasi tanggal mendarat di Jakarta.
-  * Indikator kuota bagasi (*Open / Hampir Penuh*).
+### 4. **Menu Cara Kerja / Cara Belanja (`/cara-belanja`)**
+* **Fungsi:** Halaman edukasi bagi pembeli baru agar memahami mekanisme titip belanja Jepang dari awal hingga paket sampai di rumah.
+* **Fitur yang Tersedia:** Rincian alur penitipan, garansi barang, estimasi durasi belanja, dan tips mencari barang Jepang.
 
 ---
 
-### 5. Menu Estimasi Biaya / Kalkulator Transparan (`/estimasi`)
-* **Fungsi:** Menghilangkan keraguan pembeli terkait tarif titip belanja dan ongkir kargo.
-* **Fitur Utama:**
-  * Input nominal harga barang dalam Yen Jepang (¥).
-  * Otomatis mengkalkulasi:
-    * Nilai barang dalam Rupiah berdasarkan kurs hari ini.
+### 5. **Menu Jadwal Penerbangan (`/jadwal-penerbangan`)**
+* **Fungsi:** Menghadirkan rasa kepastian tanggal belanja dan keberangkatan kargo/shopper.
+* **Fitur yang Tersedia:**
+  * Menampilkan maskapai penerbangan resmi (ANA, JAL, Garuda Indonesia).
+  * Batas waktu setor titipan (*Cut-off Order Date*).
+  * Estimasi tanggal mendarat di bandara Soekarno-Hatta (CGK).
+  * Status kuota bagasi penerbangan (*Open / Hampir Penuh*).
+
+---
+
+### 6. **Menu Estimasi Biaya / Kalkulator Transparan (`/estimasi`)**
+* **Fungsi:** Menghilangkan keraguan pembeli mengenai biaya tersembunyi (*hidden fees*).
+* **Fitur yang Tersedia:**
+  * Pembeli cukup memasukkan harga barang dalam Yen Jepang (¥).
+  * Sistem menghitung otomatis:
+    * Konversi nilai barang ke Rupiah berdasarkan kurs live.
     * Fee jasa titip (*Jastip Fee*) yang adil.
-    * Pilihan ongkir kargo Jepang: EMS Express (3-5 hari), Air Cargo Terjadwal (7-10 hari), atau Pos Reguler.
+    * Pilihan ongkir kargo Jepang: EMS Express (3-5 hari kerja), Air Cargo Terjadwal (7-10 hari), atau Pos Reguler.
     * Estimasi bea masuk & pajak impor Indonesia secara transparan.
-  * Tombol konsultasi langsung ke WhatsApp dengan rincian hitungan yang sudah tersusun rapi.
+  * Tombol kirim rincian perhitungan langsung ke WhatsApp CS.
 
 ---
 
-### 6. Menu Lacak Resi Kargo & Status Pesanan (`/status-pesanan`)
-* **Fungsi:** Pelacakan pesanan mandiri sehingga pelanggan tidak perlu repot menanyakan *"Barang saya sudah sampai mana?"* ke chat admin.
-* **Fitur Utama:**
-  * **Privasi Ketat & Isolasi Akun**: Pelanggan yang telah login hanya akan melihat riwayat belanja miliknya sendiri (data pelanggan lain tidak akan pernah bocor). Pengunjung yang belum login dapat melacak secara aman dengan memasukkan Nomor Pesanan (misal: `#MPJ-095978`) atau Nomor Resi.
-  * **Alur Tracking Manual 4 Tahap**:
-    1. *Pesanan Dikonfirmasi & Masuk Antrean Belanja* (Kurs Yen dikunci, pesanan masuk manifes Tokyo Hub).
-    2. *Pembelian di Toko Tokyo & Pengemasan Bubble Wrap* (Shopper membeli langsung dan mengemas dengan bubble wrap lapis 3 standar kargo).
-    3. *Pengiriman Kargo Udara (Japan Post EMS / Paxel)* (Dilengkapi nomor resi resmi dan tombol pelacakan langsung ke situs kurir).
+### 7. **Menu Testimoni (`/testimoni`)**
+* **Fungsi:** Membangun kredibilitas dan bukti sosial (*social proof*).
+* **Fitur yang Tersedia:** Ulasan kepuasan pembeli, rating bintang 5, foto barang hasil belanja di Tokyo, dan tanggal kloter belanja.
+
+---
+
+### 8. **Menu FAQ / Tanya Jawab (`/faq`)**
+* **Fungsi:** Menjawab pertanyaan pelanggan yang sering diajukan (*self-service*).
+* **Fitur yang Tersedia:** Informasi mengenai keaslian struk belanja, barang yang dilarang bea cukai (Lartas/BPOM), garansi barang pecah belah, dan kebijakan pembatalan.
+
+---
+
+### 9. **Menu Lacak Resi Kargo & Status Pesanan (`/status-pesanan`)**
+* **Fungsi:** Pusat pelacakan pesanan mandiri sehingga pelanggan tidak perlu repot menanyakan status paket secara manual via chat.
+* **Fitur yang Tersedia:**
+  * **Privasi Ketat:** Pelanggan yang login hanya dapat melihat pesanannya sendiri. Pengunjung tanpa login wajib mengetikkan nomor order (misal `#MPJ-095978`) atau nomor resi resmi.
+  * **Alur Tracking 4 Tahap:**
+    1. *Pesanan Dikonfirmasi & Masuk Antrean Belanja* (Kurs yen dikunci, masuk manifes Tokyo Hub).
+    2. *Pembelian di Toko Tokyo & Pengemasan Bubble Wrap Lapis 3* (Shopper membeli langsung dan mengemas sesuai standar kargo internasional).
+    3. *Pengiriman Kargo Udara (Japan Post EMS / Paxel / JNE)* (Dilengkapi nomor resi resmi dan tombol 1-klik untuk melacak di website resmi kurir).
     4. *Pesanan Telah Selesai Diterima* (Paket sampai di tangan pembeli dengan aman).
 
 ---
 
-### 7. Menu Checkout & Pembayaran (`/checkout`)
-* **Fungsi:** Titik penguncian pesanan dan pemilihan metode pengiriman.
-* **Fitur Utama:**
-  * Otomatis mengisi nama, nomor telepon WhatsApp, dan alamat sesuai data profil akun yang sedang login.
-  * Pilihan zona pengiriman di Indonesia (Jabodetabek, Jawa Barat, Luar Pulau Jawa).
+### 10. **Menu Keranjang Belanja & Checkout (`/checkout`)**
+* **Fungsi:** Tempat pembeli mengunci pesanan, mengisi alamat, dan memilih pengiriman.
+* **Fitur yang Tersedia:**
+  * Data otomatis terisi dari akun profil yang sedang login (nama, nomor WA, alamat).
+  * Pilihan zona tujuan pengiriman di Indonesia (Jabodetabek, Jawa Barat, Luar Jawa).
   * Pilihan metode pembayaran: **Transfer Bank BCA** dan **QRIS Realtime**.
   * **Penyimpanan Otomatis ke Cloud Supabase**: Pesanan yang dibuat langsung tersimpan permanen di database tabel `orders`.
 
 ---
 
-### 8. Portal Khusus Admin (`/admin`)
+### 11. **Portal Khusus Admin (`/admin`)**
 * **Fungsi:** Pusat kendali operasional harian bagi pemilik usaha dan admin toko.
-* **Fitur Utama:**
-  * **Proteksi Akses PIN**: Keamanan akses khusus pengelola toko.
-  * **Manajemen Pesanan Realtime**: Melihat seluruh pesanan masuk dari pembeli secara langsung dari Supabase.
-  * **Kontrol Tracking Bertahap**: Admin cukup menekan tombol *"Konfirmasi Sudah Dikemas"*, *"Konfirmasi Dikirim & Input Resi"*, hingga *"Pesanan Selesai"*.
-  * **Input Nomor Resi Kargo**: Menginput nomor resi (misal resi EMS Japan Post `EJ...JP` atau resi Paxel/JNE) yang seketika langsung tampil di halaman pelacakan pelanggan.
-  * **Penghapusan Data Permanen**: Tombol hapus pesanan langsung membersihkan data dari database Cloud.
+* **Fitur yang Tersedia:**
+  * **Proteksi Akses PIN**: Akses terenkripsi khusus admin.
+  * **Manajemen Pesanan Realtime**: Membaca seluruh pesanan masuk dari Cloud Database Supabase.
+  * **Tombol Kontrol Tracking Bertahap**: Admin cukup menekan tombol *"Konfirmasi Sudah Dikemas"*, *"Konfirmasi Dikirim & Input Resi"*, hingga *"Pesanan Selesai"*.
+  * **Input Nomor Resi Kargo**: Menginput nomor resi resmi (Japan Post EMS, Paxel, JNE) yang seketika langsung tampil di layar pelacakan pelanggan.
+  * **Hapus Pesanan Permanen**: Tombol hapus pesanan langsung membersihkan data dari database Cloud.
 
 ---
 
-## 💎 3. KELEBIHAN UTAMA WEBSITE (SELLING POINTS)
+## 🚫 3. APA SAJA YANG BELUM DIPASANG? (BELUM ADA)
 
-1. **Tingkat Kepercayaan Tinggi (Trust Factor):**
-   * Desain tidak terlihat seperti toko jastip amatir, melainkan platform e-commerce jastip premium dengan filosofi pelayanan Jepang (*Omotenashi*).
-   * Bukti struk resmi dan transparansi bea cukai memberikan rasa aman bagi pembeli barang bernilai tinggi (seperti tas branded, kamera, gadget, dan skincare mahal).
+*Poin-poin ini adalah fitur pelengkap yang belum ada di versi saat ini dan bisa dijadikan pengembangan tahap selanjutnya (Fase 2):*
+
+1. **Payment Gateway Otomatis (Midtrans / Xendit / Moota):**
+   * *Kondisi saat ini:* Pembeli melakukan transfer manual ke rekening BCA atau scan QRIS statis, lalu konfirmasi pembayaran ke admin.
+   * *Yang belum ada:* Belum ada integrasi API bank otomatis yang mendeteksi uang masuk ke rekening secara mandiri dan mengubah status jadi *"Lunas"* otomatis tanpa dicek manual oleh admin.
+
+2. **Bot Pengirim Pesan WhatsApp Otomatis (Fonnte / Wwebjs):**
+   * *Kondisi saat ini:* Pembeli dan admin berkomunikasi melalui tautan WhatsApp generator biasa.
+   * *Yang belum ada:* Belum ada bot otomatis yang langsung mengirim pesan WhatsApp ke nomor HP pelanggan setiap kali admin menginput resi atau mengubah status pesanan.
+
+3. **Form Tambah & Edit Produk Dinamis di Layar Admin:**
+   * *Kondisi saat ini:* Produk di halaman katalog masih berupa data bawaan sistem (*dummy products*).
+   * *Yang belum ada:* Admin belum bisa mengunggah foto produk baru, mengganti harga promo, dan menghapus barang langsung dari formulir layar admin ke tabel database Supabase.
+
+4. **Pengiriman Email Notifikasi Otomatis (SMTP / Resend):**
+   * *Yang belum ada:* Belum ada pengiriman bukti struk/invoice ke alamat email pembeli secara otomatis setelah checkout.
+
+5. **Nama Domain Resmi Berbayar (.com / .id):**
+   * *Kondisi saat ini:* Website masih menggunakan alamat gratis GitHub Pages (`kirimdigi.github.io/MapahJastip/`).
+   * *Yang belum ada:* Belum dipasangi domain resmi bermerek seperti `mapahjastip.id` atau `mapahjastip.com`.
+
+---
+
+## 💎 4. KELEBIHAN WEBSITE INI
+
+1. **Faktor Kepercayaan Tinggi (*High Trust Factor*):**
+   * Desain profesional bertema Jepang (*Omotenashi*), bersih, tidak kaku, dan jauh lebih meyakinkan dibanding toko jastip yang hanya menggunakan media sosial atau spreadsheet.
+   * Dilengkapi bukti struk resmi dan transparansi legalitas cukai, sehingga pembeli barang bernilai tinggi (tas branded, kamera, gadget, kosmetik mahal) merasa sangat aman.
 
 2. **Database Cloud Modern & Terpusat (Supabase):**
-   * Data tidak tersimpan lokal di satu komputer, melainkan tersimpan di cloud database internasional (Supabase PostgreSQL). Jika admin membuka laptop atau perangkat lain, data tetap sama dan terpusat.
+   * Data akun pengguna dan pesanan tidak disimpan di komputer lokal, melainkan di Cloud Database PostgreSQL (Supabase). Jika admin membuka laptop atau smartphone lain, seluruh data tetap sinkron secara realtime.
 
-3. **Sinkronisasi Dua Arah yang Akurat:**
-   * Apapun yang diubah admin di dashboard (mengubah status ke kemas, input resi, dll.) seketika langsung berubah pada tampilan pelanggan.
+3. **Sistem Tracking Kargo 4 Tahap yang Sinkron:**
+   * Hubungan dua arah antara Dashboard Admin dan halaman Lacak Pesanan pelanggan berjalan akurat. Begitu admin memperbarui status belanja di Tokyo, pembeli langsung melihat pembaruannya di HP masing-masing.
 
 4. **Keamanan Privasi Pelanggan:**
-   * Sistem memiliki isolasi data yang ketat: Akun Budi hanya melihat pesanan Budi, tidak bisa mengintip pesanan pelanggan lain.
+   * Data belanja pembeli diisolasi ketat. Akun Budi hanya bisa melihat riwayat belanja miliknya sendiri dan tidak bisa melihat data pelanggan lain.
 
-5. **Kecepatan Akses Sangat Tinggi (*Ultra Fast Loading*):**
-   * Dibangun menggunakan arsitektur modern (React 18 + Vite), halaman terbuka instan tanpa jeda loading berat.
-
----
-
-## 🚀 4. REKOMENDASI PENGEMBANGAN TAHAP SELANJUTNYA (FASE 2)
-
-*Poin-poin ini dapat disampaikan ke klien agar mereka melihat bahwa sistem ini memiliki peta jalan (*roadmap*) jangka panjang yang profesional:*
-
-1. **Otomatisasi Payment Gateway (Midtrans / Xendit / Moota):**
-   * *Saat ini:* Menggunakan sistem instruksi transfer manual BCA dan QRIS.
-   * *Fase 2:* Sistem mendeteksi otomatis saat uang masuk ke rekening dan status pesanan langsung berubah *"Lunas"* dalam 3 detik tanpa verifikasi manual.
-
-2. **WhatsApp Bot Notification (Fonnte / Wwebjs):**
-   * *Saat ini:* Pengiriman bukti dan chat terhubung lewat tautan WhatsApp generator.
-   * *Fase 2:* Sistem otomatis mengirim pesan WhatsApp ke nomor HP pelanggan setiap kali shopper mengubah status pesanan (misal: notifikasi *"Pesanan Anda telah dikemas di Tokyo Hub"* atau *"Paket sudah terbang, nomor resi Anda adalah EJ..."*).
-
-3. **Manajemen Produk Dinamis di Dashboard Admin:**
-   * *Saat ini:* Produk katalog dikelola melalui file konfigurasi data.
-   * *Fase 2:* Admin dapat menambah foto produk baru, mengganti harga promo, dan menghapus stok langsung dari formulir layar admin.
+5. **Performa Sangat Ringan & Cepat (*Ultra Fast Loading*):**
+   * Dibangun dengan arsitektur modern (React 18 + Vite), website terbuka seketika tanpa jeda pemuatan halaman yang lambat.
 
 ---
 
-## 🎯 5. CONTOH KALIMAT PENUTUP SAAT PRESENTASI KE KLIEN
+## ⚠️ 5. KEKURANGAN WEBSITE INI
+
+1. **Verifikasi Pembayaran Masih Mengandalkan Pengecekan Admin:**
+   * Admin masih perlu mengecek mutasi rekening bank secara manual untuk memastikan dana pembeli sudah masuk sebelum melanjutkan belanjaan ke tahap Tokyo Hub.
+
+2. **Katalog Produk Belum Terhubung Database Mandiri:**
+   * Penambahan barang baru di katalog masih memerlukan pengaturan file data produk oleh developer, belum bisa di-upload mandiri lewat form admin.
+
+3. **Pelacakan Resi Bukan Penarikan API Ekspedisi Langsung:**
+   * Admin harus memasukkan nomor resi kargo secara manual ke sistem. Sistem sudah menyediakan tombol langsung ke situs resmi kurir Japan Post / Paxel, namun belum menarik riwayat pergerakan paket secara otomatis dari API ekspedisi berbayar.
+
+---
+
+## 🎯 6. SKRIP CONTOH PRESENTASI KE KLIEN
 
 > *"Bapak/Ibu, sistem website **MapahJastip.id** saat ini telah siap sekitar **92%** dan sudah aktif online di server demo.  
-> Seluruh alur utama bisnis — mulai dari katalog, kalkulator yen, checkout belanja, login akun pelanggan, pelacakan resi kargo 4 tahap yang terhubung dengan kurir resmi Jepang, hingga portal admin untuk kontrol resi — **sudah beroperasi 100% dan terhubung ke database Cloud Supabase**.  
-> Kita tinggal memastikan data produk katalog awal dan nomor rekening operasional disesuaikan, dan website ini sudah siap digunakan untuk menerima pesanan perdana dari para pembeli."*
+> Seluruh alur utama bisnis — mulai dari katalog barang, kalkulator kurs yen transparan, keranjang belanja, checkout, sistem login pelanggan, pelacakan resi kargo 4 tahap terintegrasi dengan ekspedisi resmi Jepang, hingga dashboard admin untuk input resi — **sudah beroperasi penuh dan terhubung ke Database Cloud Supabase**.  
+> Di tahap ini kita tinggal melengkapi rincian rekening operasional dan produk unggulan. Sedangkan fitur seperti payment gateway otomatis dan bot WhatsApp dapat kita jadwalkan sebagai pengembangan tahap berikutnya seiring bertambahnya volume pesanan."*
