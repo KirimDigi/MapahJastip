@@ -12,47 +12,49 @@ import { formatIdr } from '../utils/currency';
 import { generateGeneralConsultationUrl, generateResellerRegistrationUrl } from '../utils/whatsapp';
 import { useLanguage } from '../context/LanguageContext';
 
+const BASE = import.meta.env.BASE_URL;
+
 const HERO_CATEGORY_CARDS = [
   {
     id: 'skincare',
     name: 'Skincare & Beauty',
-    image: '/Logo%20Produk/01_Skincare_Beauty.png',
+    image: `${BASE}Logo%20Produk/01_Skincare_Beauty.png`,
     link: '/katalog?kategori=skincare',
   },
   {
     id: 'makanan',
     name: 'Makanan & Minuman',
-    image: '/Logo%20Produk/02_Makanan_Snack.png',
+    image: `${BASE}Logo%20Produk/02_Makanan_Snack.png`,
     link: '/katalog?kategori=makanan',
   },
   {
     id: 'fashion',
     name: 'Fashion & Brand',
-    image: '/Logo%20Produk/03_Fashion_Brand.png',
+    image: `${BASE}Logo%20Produk/03_Fashion_Brand.png`,
     link: '/katalog?kategori=fashion',
   },
   {
     id: 'elektronik',
     name: 'Elektronik',
-    image: '/Logo%20Produk/04_Elektronik.png',
+    image: `${BASE}Logo%20Produk/04_Elektronik.png`,
     link: '/katalog?kategori=elektronik',
   },
   {
     id: 'karakter',
     name: 'Jepang Character',
-    image: '/Logo%20Produk/05_Jepang_Character.png',
+    image: `${BASE}Logo%20Produk/05_Jepang_Character.png`,
     link: '/katalog?kategori=karakter',
   },
   {
     id: 'kesehatan',
     name: 'Vitamin & Kesehatan',
-    image: '/Logo%20Produk/06_Obat_Kesehatan_1.png',
+    image: `${BASE}Logo%20Produk/06_Obat_Kesehatan_1.png`,
     link: '/katalog?kategori=kesehatan',
   },
   {
     id: 'lainnya',
     name: 'Lainnya',
-    image: '/Logo%20Produk/08_Lainnya.png',
+    image: `${BASE}Logo%20Produk/08_Lainnya.png`,
     link: '/katalog',
   },
 ];
@@ -105,7 +107,7 @@ export const HomePage: React.FC = () => {
           {/* Banner Hero Full Width */}
           <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-border-subtle/70 bg-surface-container-lowest select-none">
             <img
-              src="/images/hero-mapahjastip.png"
+              src={`${BASE}images/hero-mapahjastip.png`}
               alt="MapahJastip.id - Titip Belanja di Jepang, Kami yang Urus"
               className="w-full h-auto block select-none pointer-events-none"
               loading="eager"
