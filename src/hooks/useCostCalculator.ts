@@ -75,11 +75,39 @@ export function useCostCalculator({
     }
 
     const shippingCost = (weightG / 100) * shippingRatePer100g;
-    const packagingCost = packaging === 'reinforced' ? REINFORCED_BOX_FEE : 0;
-    const kgUnits = Math.max(1, Math.ceil(weightG / 1000));
-    const domesticShippingCost = kgUnits * (selectedDestination?.ratePerKg || 15000);
+    // Standar toleransi berat kurir ekspedisi riil Indonesia (toleransi +300g per kg, contoh: <= 1.300g = 1 kg)
+    const kgUnits = Math.max(1, Math.ceil(Math.max(0, weightG - 300) / 1000));
+    const domesticShippingCost = kgUnits * (selectedDestination?.ratePerKg || 10000);
 
-    const totalCost = idrRaw + feeAmount + shippingCost + packagingCost;
+    const packagingCost = packaging === 'reinforced' ? REINFORCED_BOX_FEE : 0;
+
+    // ── KALKULASI PAJAK & BEA CUKAI INDONESIA (SESUAI PMK BEA CUKAI) ──
+    const baseTaxPct = selectedCategory.customsTaxPct ?? 18.5;
+    let customsTaxPct = 0;
+    let customsTaxAmount = 0;
+    let customsTaxNote = '';
+
+    if (shippingMethod === 'handcarry') {
+      // Fasilitas Bebas Bea Cukai Handcarry Penumpang (Maksimal USD 500 / ±Rp 8.000.000)
+      if (idrRaw <= 8000000) {
+        customsTaxPct = 0;
+        customsTaxAmount = 0;
+        customsTaxNote = 'BEBAS PAJAK (Fasilitas Handcarry Penumpang s.d. $500 / Rp 8 Juta)';
+      } else {
+        // Dikenakan tarif flat atas selisih kelebihan nilai barang di atas USD 500
+        const excess = idrRaw - 8000000;
+        customsTaxPct = 10;
+        customsTaxAmount = Math.round(excess * 0.21); // BM flat 10% + PPN 11%
+        customsTaxNote = `Pajak atas selisih kelebihan nilai barang di atas kuota $500 (${selectedCategory.name})`;
+      }
+    } else {
+      // Jalur Kargo / Kurir Paket Impor (EMS / Cargo): Kena tarif resmi PMK sesuai jenis komoditas
+      customsTaxPct = baseTaxPct;
+      customsTaxAmount = Math.round((idrRaw + shippingCost) * (baseTaxPct / 100));
+      customsTaxNote = `Tarif Resmi PMK Bea Cukai untuk ${selectedCategory.name} (${baseTaxPct}%)`;
+    }
+
+    const totalCost = idrRaw + feeAmount + shippingCost + packagingCost + customsTaxAmount;
 
     return {
       priceJpy: safeJpy,
@@ -91,7 +119,11 @@ export function useCostCalculator({
       shippingRatePer100g,
       shippingCost,
       packagingCost,
+      customsTaxPct,
+      customsTaxAmount,
+      customsTaxNote,
       domesticShippingCost,
+      domesticKgUnits: kgUnits,
       totalCost,
     };
   }, [effectiveRate, priceJpy, selectedCategory, weightG, shippingMethod, packaging, selectedDestination]);

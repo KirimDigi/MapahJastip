@@ -3,7 +3,7 @@
  */
 export function formatIdr(amount: number): string {
   const rounded = Math.round(amount);
-  return 'Rp ' + rounded.toLocaleString('id-ID');
+  return 'Rp\u00A0' + rounded.toLocaleString('id-ID');
 }
 
 /**

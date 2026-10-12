@@ -13,7 +13,7 @@ export const CategoryPills: React.FC<CategoryPillsProps> = ({
   counts = {},
 }) => {
   return (
-    <div className="overflow-x-auto pb-2 scrollbar-none flex items-center gap-2.5">
+    <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
       {CATALOG_CATEGORY_FILTERS.map((cat) => {
         const isActive = activeCategory === cat.id;
         const count = counts[cat.id];

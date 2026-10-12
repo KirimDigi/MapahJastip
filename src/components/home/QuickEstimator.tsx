@@ -2,8 +2,10 @@ import React from 'react';
 import { useCostCalculator } from '../../hooks/useCostCalculator';
 import { formatIdr, formatJpy } from '../../utils/currency';
 import { generateQuoteWhatsAppUrl } from '../../utils/whatsapp';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const QuickEstimator: React.FC = () => {
+  const { t } = useLanguage();
   const {
     priceJpy,
     setPriceJpy,
@@ -18,16 +20,16 @@ export const QuickEstimator: React.FC = () => {
     initialPriceJpy: 5000,
     initialCategoryId: 'skincare',
     initialWeightG: 300,
-    initialShippingMethod: 'handcarry',
+    initialShippingMethod: 'express',
   });
 
   const categories = [
-    { id: 'skincare', name: 'Skincare / Kosmetik', fee: '12%', weight: 300 },
-    { id: 'fashion', name: 'Fashion & Sepatu', fee: '10%', weight: 850 },
-    { id: 'anime', name: 'Figure & Pop Culture', fee: '15%', weight: 500 },
-    { id: 'snack', name: 'Makanan & Snack', fee: '10%', weight: 400 },
-    { id: 'gadget', name: 'Elektronik & Gadget', fee: '8%', weight: 600 },
-    { id: 'mercari', name: 'Mercari / Secondhand', fee: '15%', weight: 400 },
+    { id: 'sepatu', nameKey: '', defaultName: 'Sepatu & Sneakers', fee: '10%', weight: 1200 },
+    { id: 'skincare', nameKey: 'cat.skincare', defaultName: 'Skincare / Kosmetik', fee: '12%', weight: 300 },
+    { id: 'fashion', nameKey: 'cat.fashion', defaultName: 'Fashion & Tas', fee: '10%', weight: 850 },
+    { id: 'anime', nameKey: 'cat.anime', defaultName: 'Figure & Pop Culture', fee: '15%', weight: 500 },
+    { id: 'makanan', nameKey: 'cat.makanan', defaultName: 'Makanan & Minuman', fee: '10%', weight: 400 },
+    { id: 'elektronik', nameKey: 'cat.elektronik', defaultName: 'Elektronik & Gadget', fee: '8%', weight: 600 },
   ];
 
   const waUrl = generateQuoteWhatsAppUrl(
@@ -35,7 +37,12 @@ export const QuickEstimator: React.FC = () => {
     calculation.priceJpy,
     selectedCategory.name,
     calculation.totalCost,
-    shippingMethod === 'handcarry' ? 'Handcarry Koper Shopper (3-5 hari)' : 'Air Cargo All-in Terjadwal (7-10 hari)'
+    shippingMethod === 'express'
+      ? 'EMS Japan Post Express (3-5 hari)'
+      : shippingMethod === 'cargo'
+      ? 'Air Cargo All-in Terjadwal (7-10 hari)'
+      : 'Reguler Pos Udara Jepang (7-10 hari)',
+    calculation.customsTaxAmount === 0 ? 'Rp 0 (BEBAS PAJAK)' : `${formatIdr(calculation.customsTaxAmount)} (${calculation.customsTaxPct}%)`
   );
 
   return (
@@ -46,13 +53,13 @@ export const QuickEstimator: React.FC = () => {
           <div className="lg:col-span-7 bg-surface-container-lowest p-6 md:p-8 rounded-2xl shadow-sm border border-border-subtle/80 space-y-6">
             <div className="space-y-1">
               <span className="font-label-md text-label-md text-primary font-semibold uppercase tracking-wider">
-                Quick Cost Estimator
+                {t('calc.badge')}
               </span>
               <h2 className="font-headline-md text-headline-md text-on-surface">
-                Hitung Estimasi Biaya Titip Real-Time
+                {t('calc.title')}
               </h2>
               <p className="font-body-sm text-body-sm text-text-secondary leading-relaxed">
-                Gunakan kalkulator ini untuk mengetahui perkiraan biaya total sampai ke tangan Anda dengan kurs acuan live <strong className="text-primary font-semibold">Rp {calculation.exchangeRate.toFixed(2)}/JPY</strong>.
+                {t('calc.desc')} <strong className="text-primary font-semibold">Rp {calculation.exchangeRate.toFixed(2)}/JPY</strong>.
               </p>
             </div>
 
@@ -60,7 +67,7 @@ export const QuickEstimator: React.FC = () => {
               {/* Yen Price Input */}
               <div>
                 <label className="block font-label-md text-label-md text-on-surface mb-2 font-semibold" htmlFor="home-price-jpy">
-                  Harga Barang di Jepang (JPY ¥)
+                  {t('calc.priceLabel')}
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary font-headline-sm text-headline-sm">
@@ -78,31 +85,32 @@ export const QuickEstimator: React.FC = () => {
                   />
                 </div>
                 <div className="flex justify-between items-center mt-1.5 text-label-sm font-label-sm text-text-secondary">
-                  <span>Contoh: ¥3,500 (Skincare) | ¥8,000 (Sepatu)</span>
-                  <span className="text-primary font-medium">Kurs: 1 JPY = Rp 107.00</span>
+                  <span>{t('calc.samplePrice')}</span>
+                  <span className="text-primary font-medium">{t('calc.ratePrefix')} {calculation.exchangeRate.toFixed(2)}</span>
                 </div>
               </div>
 
               {/* Category Selector */}
               <div>
                 <label className="block font-label-md text-label-md text-on-surface mb-2 font-semibold">
-                  Kategori Barang
+                  {t('calc.categoryLabel')}
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                   {categories.map((cat) => {
                     const isActive = selectedCategoryId === cat.id;
+                    const catLabel = cat.nameKey ? t(cat.nameKey, cat.defaultName) : cat.defaultName;
                     return (
                       <button
                         key={cat.id}
                         type="button"
                         onClick={() => handleSelectCategory(cat.id)}
-                        className={`px-3.5 py-2.5 rounded-xl text-left font-label-md text-label-md flex flex-col gap-0.5 transition-all border ${
+                        className={`px-3.5 py-2.5 rounded-xl text-left font-label-md text-label-md flex flex-col gap-0.5 transition-all border cursor-pointer ${
                           isActive
                             ? 'bg-surface-light-blue text-primary border-primary font-bold shadow-xs'
                             : 'bg-surface-container-low text-on-surface border-transparent hover:bg-surface-soft-blue'
                         }`}
                       >
-                        <span className="font-semibold text-sm leading-tight">{cat.name}</span>
+                        <span className="font-semibold text-sm leading-tight">{catLabel}</span>
                         <span className="text-[11px] text-text-secondary">
                           Fee ~{cat.fee} (Est. {cat.weight}g)
                         </span>
@@ -115,48 +123,48 @@ export const QuickEstimator: React.FC = () => {
               {/* Shipping Speed Choice */}
               <div>
                 <label className="block font-label-md text-label-md text-on-surface mb-2 font-semibold">
-                  Metode Pengiriman Udara
+                  {t('calc.airShipping')}
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <label
-                    onClick={() => setShippingMethod('handcarry')}
-                    className={`cursor-pointer p-3.5 rounded-xl flex items-center justify-between border transition-all ${
-                      shippingMethod === 'handcarry'
+                    onClick={() => setShippingMethod('express')}
+                    className={`cursor-pointer p-3 rounded-xl flex items-center justify-between border transition-all ${
+                      shippingMethod === 'express'
                         ? 'bg-surface-light-blue border-primary shadow-xs'
                         : 'bg-surface-container-low border-transparent hover:bg-surface-soft-blue'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <input
                         type="radio"
                         name="shipping_speed"
-                        checked={shippingMethod === 'handcarry'}
-                        onChange={() => setShippingMethod('handcarry')}
+                        checked={shippingMethod === 'express'}
+                        onChange={() => setShippingMethod('express')}
                         className="w-4 h-4 text-primary"
                       />
                       <div>
-                        <div className="font-title-md text-label-md text-on-surface font-semibold">
-                          Handcarry Koper Shopper
+                        <div className="font-title-md text-xs text-on-surface font-bold">
+                          ✈️ EMS Express
                         </div>
-                        <div className="font-body-sm text-[12px] text-text-secondary">
-                          Estimasi 3-5 hari (Bawa di Koper)
+                        <div className="font-body-sm text-[11px] text-text-secondary">
+                          Tokyo Direct (3-5 hr)
                         </div>
                       </div>
                     </div>
-                    <span className="font-label-md text-label-sm text-primary font-bold">
-                      Rp 28.000 / 100g
+                    <span className="font-label-md text-xs text-primary font-bold">
+                      25k/100g
                     </span>
                   </label>
 
                   <label
                     onClick={() => setShippingMethod('cargo')}
-                    className={`cursor-pointer p-3.5 rounded-xl flex items-center justify-between border transition-all ${
+                    className={`cursor-pointer p-3 rounded-xl flex items-center justify-between border transition-all ${
                       shippingMethod === 'cargo'
                         ? 'bg-surface-light-blue border-primary shadow-xs'
                         : 'bg-surface-container-low border-transparent hover:bg-surface-soft-blue'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <input
                         type="radio"
                         name="shipping_speed"
@@ -165,16 +173,46 @@ export const QuickEstimator: React.FC = () => {
                         className="w-4 h-4 text-primary"
                       />
                       <div>
-                        <div className="font-title-md text-label-md text-on-surface font-semibold">
-                          Air Cargo All-in Terjadwal
+                        <div className="font-title-md text-xs text-on-surface font-bold">
+                          🚢 Air Cargo
                         </div>
-                        <div className="font-body-sm text-[12px] text-text-secondary">
-                          Estimasi 7-10 hari (All-in Cukai)
+                        <div className="font-body-sm text-[11px] text-text-secondary">
+                          All-in Cukai (7-10 hr)
                         </div>
                       </div>
                     </div>
-                    <span className="font-label-md text-label-sm text-on-surface font-bold">
-                      Rp 24.000 / 100g
+                    <span className="font-label-md text-xs text-primary font-bold">
+                      24k/100g
+                    </span>
+                  </label>
+
+                  <label
+                    onClick={() => setShippingMethod('regular')}
+                    className={`cursor-pointer p-3 rounded-xl flex items-center justify-between border transition-all ${
+                      shippingMethod === 'regular'
+                        ? 'bg-surface-light-blue border-primary shadow-xs'
+                        : 'bg-surface-container-low border-transparent hover:bg-surface-soft-blue'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="shipping_speed"
+                        checked={shippingMethod === 'regular'}
+                        onChange={() => setShippingMethod('regular')}
+                        className="w-4 h-4 text-primary"
+                      />
+                      <div>
+                        <div className="font-title-md text-xs text-on-surface font-bold">
+                          📦 Pos Udara
+                        </div>
+                        <div className="font-body-sm text-[11px] text-text-secondary">
+                          Air Parcel (7-10 hr)
+                        </div>
+                      </div>
+                    </div>
+                    <span className="font-label-md text-xs text-primary font-bold">
+                      16.5k/100g
                     </span>
                   </label>
                 </div>
@@ -186,26 +224,26 @@ export const QuickEstimator: React.FC = () => {
           <div className="lg:col-span-5 bg-surface-container-lowest p-6 md:p-8 rounded-2xl shadow-lg border border-border-subtle space-y-6">
             <div className="flex items-center justify-between pb-3 bg-surface-soft-blue p-3.5 rounded-xl border border-border-subtle/50">
               <span className="font-title-md text-title-md text-on-surface font-bold">
-                Rincian Estimasi Biaya
+                {t('calc.resultTitle')}
               </span>
               <span className="inline-flex items-center gap-1 font-label-sm text-label-sm text-success-text bg-success-bg px-2.5 py-0.5 rounded-full font-semibold">
-                <span className="material-symbols-outlined text-[14px]">shield</span> All-in Safe
+                <span className="material-symbols-outlined text-[14px]">shield</span> {t('calc.safeBadge')}
               </span>
             </div>
 
             {/* Breakdown Rows */}
             <div className="space-y-3 font-body-md text-sm">
               <div className="flex justify-between text-text-secondary">
-                <span>Harga Barang JPY</span>
+                <span>{t('calc.priceLabel')}</span>
                 <span className="font-semibold text-on-surface">{formatJpy(calculation.priceJpy)}</span>
               </div>
               <div className="flex justify-between text-text-secondary">
-                <span>Konversi Rupiah (x Rp {calculation.exchangeRate.toFixed(2)})</span>
+                <span>{t('calc.currencyConv')} (x Rp {calculation.exchangeRate.toFixed(2)})</span>
                 <span className="font-semibold text-on-surface">{formatIdr(calculation.priceIdr)}</span>
               </div>
               <div className="flex justify-between text-text-secondary">
                 <span className="flex items-center gap-1">
-                  Fee Jastip Concierge{' '}
+                  {t('calc.conciergeFee')}{' '}
                   <span className="text-xs bg-surface-container-highest px-1.5 py-0.5 rounded text-primary font-bold">
                     ({calculation.feePct}%)
                   </span>
@@ -214,18 +252,33 @@ export const QuickEstimator: React.FC = () => {
               </div>
               <div className="flex justify-between text-text-secondary">
                 <span className="flex items-center gap-1">
-                  Estimasi Ongkir Jepang ➔ JKT{' '}
+                  {t('calc.estShipping')}{' '}
                   <span className="text-xs text-text-secondary">({weightG}g)</span>
                 </span>
                 <span className="font-semibold text-on-surface">{formatIdr(calculation.shippingCost)}</span>
               </div>
-              <div className="flex justify-between text-text-secondary">
-                <span>Handling &amp; Bubble Wrap Tebal</span>
-                <span className="text-success-text font-semibold">GRATIS</span>
+              <div className="flex justify-between items-center text-text-secondary">
+                <span className="flex items-center gap-1.5">
+                  <span>Pajak & Bea Cukai ID</span>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                    calculation.customsTaxAmount === 0
+                      ? 'bg-success-bg text-success-text'
+                      : 'bg-amber-100 text-amber-800'
+                  }`}>
+                    {calculation.customsTaxAmount === 0 ? 'Bebas Pajak' : `${calculation.customsTaxPct}% PMK`}
+                  </span>
+                </span>
+                <span className="font-semibold text-on-surface">
+                  {calculation.customsTaxAmount === 0 ? 'Rp 0' : formatIdr(calculation.customsTaxAmount)}
+                </span>
               </div>
               <div className="flex justify-between text-text-secondary">
-                <span>Asuransi Kargo Penuh</span>
-                <span className="text-success-text font-semibold">TERMASUK</span>
+                <span>{t('calc.freePackaging')}</span>
+                <span className="text-success-text font-semibold">{t('calc.free')}</span>
+              </div>
+              <div className="flex justify-between text-text-secondary">
+                <span>{t('calc.cargoInsurance')}</span>
+                <span className="text-success-text font-semibold">{t('calc.included')}</span>
               </div>
             </div>
 
@@ -233,14 +286,14 @@ export const QuickEstimator: React.FC = () => {
             <div className="p-4 bg-surface-container-low rounded-xl space-y-1 border border-border-subtle/60">
               <div className="flex justify-between items-baseline">
                 <span className="font-title-md text-label-md text-text-secondary font-semibold">
-                  Total Estimasi Bersih
+                  {t('calc.cleanTotal')}
                 </span>
                 <span className="font-headline-lg text-headline-lg text-primary font-bold tabular-nums">
                   {formatIdr(calculation.totalCost)}
                 </span>
               </div>
               <p className="text-[12px] text-text-secondary">
-                *Belum termasuk ongkir lokal dari gudang Jakarta ke alamat rumah Anda via JNE/SiCepat.
+                {t('calc.localShippingNote')}
               </p>
             </div>
 
@@ -252,12 +305,12 @@ export const QuickEstimator: React.FC = () => {
               className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-4 bg-success text-white font-label-md text-label-md rounded-xl hover:bg-success-text shadow-[0_4px_16px_rgba(24,168,116,0.3)] transition-all font-bold"
             >
               <span className="material-symbols-outlined text-[22px]">chat</span>
-              <span>Kirim Estimasi ke WhatsApp Shopper</span>
+              <span>{t('calc.sendWaCta')}</span>
             </a>
 
             <div className="flex items-center justify-center gap-2 text-label-sm font-label-sm text-text-secondary">
               <span className="material-symbols-outlined text-success text-[16px]">verified</span>
-              <span>Konsultasi tanya stok di toko fisik Tokyo tanpa dipungut biaya</span>
+              <span>{t('calc.freeConsult')}</span>
             </div>
           </div>
         </div>

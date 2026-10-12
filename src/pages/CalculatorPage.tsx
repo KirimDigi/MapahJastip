@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useCostCalculator } from '../hooks/useCostCalculator';
 import { useExchangeRate } from '../context/ExchangeRateContext';
+import { useLanguage } from '../context/LanguageContext';
 import { JAPAN_MERCHANTS, DESTINATION_ZONES } from '../constants/rates';
+import { CATEGORIES } from '../constants/categories';
 import { formatIdr, formatJpy } from '../utils/currency';
 import { generateQuoteWhatsAppUrl } from '../utils/whatsapp';
 
 export const CalculatorPage: React.FC = () => {
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const initialBatch = searchParams.get('batch');
   const { rate, isLive, isLoading, lastUpdated, source, refetch, setCustomRate } = useExchangeRate();
@@ -35,9 +38,9 @@ export const CalculatorPage: React.FC = () => {
     calculation,
   } = useCostCalculator({
     initialPriceJpy: 14300,
-    initialCategoryId: 'fashion',
+    initialCategoryId: 'sepatu',
     initialWeightG: 1200,
-    initialShippingMethod: 'handcarry',
+    initialShippingMethod: 'express',
     initialPackaging: 'standard',
   });
 
@@ -46,7 +49,8 @@ export const CalculatorPage: React.FC = () => {
     calculation.priceJpy,
     selectedCategory.name,
     calculation.totalCost + calculation.domesticShippingCost,
-    `${shippingMethod === 'handcarry' ? 'Air Cargo Handcarry' : 'Air Cargo Express'} + Kirim ke ${selectedDestination?.name}`
+    `${shippingMethod === 'express' ? 'EMS Japan Post Express (Tokyo Direct)' : 'Reguler Pos Udara Jepang'} + Kirim ke ${selectedDestination?.name}`,
+    calculation.customsTaxAmount === 0 ? 'Rp 0 (BEBAS PAJAK)' : `${formatIdr(calculation.customsTaxAmount)} (${calculation.customsTaxPct}%)`
   );
 
   return (
@@ -67,14 +71,14 @@ export const CalculatorPage: React.FC = () => {
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-light-blue rounded-full border border-primary/20">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <span className="font-label-sm text-label-sm text-primary tracking-wide uppercase font-semibold">
-                Real-Time Japanese Yen Calculator
+                {t('calcPage.badge')}
               </span>
             </div>
             <h1 className="font-display text-3xl sm:text-4xl lg:text-display text-on-surface tracking-tight">
-              Kalkulator Estimasi Biaya Jastip Jepang
+              {t('calcPage.title')}
             </h1>
             <p className="font-body-lg text-body-lg text-text-secondary leading-relaxed">
-              Hitung total biaya belanja transparan tanpa biaya siluman. Lengkap dengan kurs real-time, fee jastip resmi, dan biaya kirim aman langsung ke alamat kotamu di Indonesia.
+              {t('calcPage.desc')}
             </p>
             {initialBatch && (
               <div className="pt-2">
@@ -205,29 +209,29 @@ export const CalculatorPage: React.FC = () => {
                     1
                   </span>
                   <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                    Informasi Produk &amp; Harga Toko
+                    {t('calcPage.step1Title')}
                   </h2>
                 </div>
-                <span className="font-label-sm text-xs text-text-secondary">Wajib Diisi</span>
+                <span className="font-label-sm text-xs text-text-secondary">{t('calcPage.step1Required')}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="font-label-md text-label-md text-on-surface font-semibold" htmlFor="calc-name">
-                    Nama Produk
+                    {t('calcPage.productName')}
                   </label>
                   <input
                     id="calc-name"
                     type="text"
                     value={itemName}
                     onChange={(e) => setItemName(e.target.value)}
-                    placeholder="Contoh: Rohto Melano CC, Figure Jujutsu"
+                    placeholder={t('calcPage.productNamePlaceholder')}
                     className="w-full px-4 py-3 bg-surface-container-low rounded-xl text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-container border border-border-subtle/50 transition-all"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="font-label-md text-label-md text-on-surface font-semibold" htmlFor="calc-store">
-                    Toko Asal / Merchant
+                    {t('calcPage.storeMerchant')}
                   </label>
                   <select
                     id="calc-store"
@@ -247,7 +251,7 @@ export const CalculatorPage: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="font-label-md text-label-md text-on-surface font-semibold" htmlFor="calc-price">
-                    Harga Asli (Yen - ¥ JPY)
+                    {t('calcPage.originalPriceJpy')}
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-3 text-text-secondary font-headline-sm">¥</span>
@@ -264,20 +268,19 @@ export const CalculatorPage: React.FC = () => {
                 </div>
                 <div className="space-y-1.5">
                   <label className="font-label-md text-label-md text-on-surface font-semibold" htmlFor="calc-category">
-                    Kategori Barang
+                    {t('calcPage.category')}
                   </label>
                   <select
                     id="calc-category"
                     value={selectedCategoryId}
                     onChange={(e) => handleSelectCategory(e.target.value)}
-                    className="w-full px-4 py-3 bg-surface-container-low rounded-xl text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-container border border-border-subtle/50 transition-all cursor-pointer"
+                    className="w-full px-4 py-3 bg-surface-container-low rounded-xl text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-container border border-border-subtle/50 transition-all cursor-pointer font-medium"
                   >
-                    <option value="fashion">Fashion, Pakaian &amp; Sepatu (Fee 10%)</option>
-                    <option value="skincare">Skincare, Kosmetik &amp; Suplemen (Fee 12%)</option>
-                    <option value="anime">Hobby, Figure &amp; Collectibles (Fee 15%)</option>
-                    <option value="snack">General Goods, Camilan &amp; Matcha (Fee 10%)</option>
-                    <option value="gadget">Elektronik &amp; Gadget Ringan (Fee 8%)</option>
-                    <option value="mercari">Mercari / Secondhand (Fee 15%)</option>
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name} (Bea Cukai: {cat.customsTaxPct}%)
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -291,7 +294,7 @@ export const CalculatorPage: React.FC = () => {
                     2
                   </span>
                   <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                    Perkiraan Berat &amp; Packaging Protektif
+                    {t('calcPage.step2Title')}
                   </h2>
                 </div>
                 <span className="font-title-md text-title-md text-primary font-bold">
@@ -301,8 +304,8 @@ export const CalculatorPage: React.FC = () => {
 
               <div className="space-y-2 bg-surface-container-low p-4 rounded-xl border border-border-subtle/50">
                 <div className="flex justify-between items-center text-label-sm font-label-sm text-text-secondary text-xs">
-                  <span>0.2 kg (Ringan / Kosmetik)</span>
-                  <span>10.0 kg (Kargo Besar)</span>
+                  <span>{t('calcPage.weightLight')}</span>
+                  <span>{t('calcPage.weightHeavy')}</span>
                 </div>
                 <input
                   type="range"
@@ -314,14 +317,14 @@ export const CalculatorPage: React.FC = () => {
                   className="w-full h-2 bg-surface-variant rounded-lg appearance-none cursor-pointer accent-primary"
                 />
                 <p className="font-body-sm text-xs text-text-secondary">
-                  Berat ditimbang riil saat shopper menerima barang di Tokyo Hub. Pembulatan per 0.5 kg ke atas.
+                  {t('calcPage.weightNote')}
                 </p>
               </div>
 
               {/* Packaging Options */}
               <div className="space-y-2">
                 <label className="font-label-md text-label-md text-on-surface font-semibold block">
-                  Proteksi Packaging Ekstra
+                  {t('calcPage.packTitle')}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <label
@@ -341,10 +344,10 @@ export const CalculatorPage: React.FC = () => {
                     />
                     <div>
                       <span className="font-title-md text-sm text-on-surface font-bold block">
-                        Standard Concierge Pack
+                        {t('calcPage.packStd')}
                       </span>
                       <span className="font-body-sm text-xs text-text-secondary block">
-                        Bubble wrap 3 lapis + polymailer aman (Gratis)
+                        {t('calcPage.packStdDesc')}
                       </span>
                     </div>
                   </label>
@@ -366,10 +369,10 @@ export const CalculatorPage: React.FC = () => {
                     />
                     <div>
                       <span className="font-title-md text-sm text-on-surface font-bold block">
-                        Armor Box &amp; Corner Guard
+                        {t('calcPage.packArm')}
                       </span>
                       <span className="font-body-sm text-xs text-text-secondary block">
-                        Box double wall anti-penyok + proteksi figure (+Rp 35.000)
+                        {t('calcPage.packArmDesc')}
                       </span>
                     </div>
                   </label>
@@ -384,31 +387,30 @@ export const CalculatorPage: React.FC = () => {
                   3
                 </span>
                 <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                  Metode Kirim &amp; Alamat Domestik
+                  {t('calcPage.step3Title')}
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="font-label-md text-label-md text-on-surface font-semibold" htmlFor="calc-shipping">
-                    Jalur Logistik Tokyo ⇄ JKT
+                    {t('calcPage.shippingRoute')}
                   </label>
                   <select
                     id="calc-shipping"
                     value={shippingMethod}
                     onChange={(e) => setShippingMethod(e.target.value as any)}
-                    className="w-full px-4 py-3 bg-surface-container-low rounded-xl text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-container border border-border-subtle/50 transition-all cursor-pointer"
+                    className="w-full px-4 py-3 bg-surface-container-low rounded-xl text-on-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-container border border-border-subtle/50 transition-all cursor-pointer font-bold"
                   >
-                    <option value="handcarry">Handcarry Koper Shopper (Rp 28.000/100g • 3-5 Hari)</option>
-                    <option value="cargo">Air Cargo All-in Terjadwal (Rp 24.000/100g • 7-10 Hari)</option>
-                    <option value="express">Air Express Prioritas Direct (Rp 35.000/100g • 3-5 Hari)</option>
-                    <option value="regular">Air Regular Konsolidasi (Rp 22.000/100g • 10-14 Hari)</option>
+                    <option value="express">✈️ EMS Japan Post Express (Rp 25.000/100g • 3-5 Hari Kerja)</option>
+                    <option value="cargo">🚢 Air Cargo Terjadwal (Rp 24.000/100g • 7-10 Hari Kerja)</option>
+                    <option value="regular">📦 Reguler Pos Udara Jepang (Rp 16.500/100g • 7-10 Hari Kerja)</option>
                   </select>
                 </div>
 
                 <div className="space-y-2">
                   <label className="font-label-md text-label-md text-on-surface font-semibold" htmlFor="calc-destination">
-                    Wilayah Kota Tujuan di Indonesia
+                    {t('calcPage.destinationCity')}
                   </label>
                   <select
                     id="calc-destination"
@@ -424,6 +426,22 @@ export const CalculatorPage: React.FC = () => {
                   </select>
                 </div>
               </div>
+
+              <div className="p-3.5 bg-blue-50 dark:bg-blue-950/40 border border-primary/20 rounded-xl flex items-start gap-2.5 text-xs text-on-surface">
+                <span className="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">verified_user</span>
+                <div className="space-y-0.5">
+                  <span className="font-bold text-primary block">
+                    {shippingMethod === 'express'
+                      ? '✈️ Jalur EMS Japan Post: Tarif Resmi Rp 25.000 / 100g (~Rp 250.000 / kg • 3-5 Hari Kerja)'
+                      : shippingMethod === 'cargo'
+                      ? '🚢 Jalur Air Cargo: Tarif Rp 24.000 / 100g (~Rp 240.000 / kg • 7-10 Hari Kerja)'
+                      : '📦 Jalur Pos Udara Reguler: Tarif Rp 16.500 / 100g (~Rp 165.000 / kg • 7-10 Hari Kerja)'}
+                  </span>
+                  <p className="text-text-secondary leading-relaxed">
+                    Pengiriman bersifat <strong>All-In Door-to-Door</strong>, sudah mencakup ongkir pos internasional dari Tokyo langsung ke alamat rumah penerima di Indonesia tanpa biaya tersembunyi.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -432,12 +450,12 @@ export const CalculatorPage: React.FC = () => {
             <div className="flex items-center justify-between pb-3 bg-surface-soft-blue p-4 rounded-xl border border-border-subtle/60">
               <div>
                 <span className="font-title-md text-title-md text-on-surface font-bold block">
-                  Digital Invoice Receipt
+                  {t('calcPage.invTitle')}
                 </span>
-                <span className="text-xs text-text-secondary">Tokyo Concierge Guarantee</span>
+                <span className="text-xs text-text-secondary">{t('calcPage.invGuarantee')}</span>
               </div>
               <span className="inline-flex items-center gap-1 font-label-sm text-xs text-success-text bg-success-bg px-2.5 py-1 rounded-full font-bold">
-                <span className="material-symbols-outlined text-[14px]">shield</span> All-in Safe
+                <span className="material-symbols-outlined text-[14px]">shield</span> {t('calcPage.invAllInSafe')}
               </span>
             </div>
 
@@ -452,16 +470,16 @@ export const CalculatorPage: React.FC = () => {
             {/* Breakdown Itemized Rows */}
             <div className="space-y-3 font-body-md text-sm">
               <div className="flex justify-between text-text-secondary">
-                <span>Harga Barang JPY</span>
+                <span>{t('calcPage.invItemJpy')}</span>
                 <span className="font-semibold text-on-surface">{formatJpy(calculation.priceJpy)}</span>
               </div>
               <div className="flex justify-between text-text-secondary">
-                <span>Konversi Rupiah (x Rp {calculation.exchangeRate.toFixed(2)})</span>
+                <span>{t('calcPage.invConvIdr')} (x Rp {calculation.exchangeRate.toFixed(2)})</span>
                 <span className="font-semibold text-on-surface">{formatIdr(calculation.priceIdr)}</span>
               </div>
               <div className="flex justify-between text-text-secondary">
                 <span className="flex items-center gap-1">
-                  Fee Jastip Concierge{' '}
+                  {t('calcPage.invFee')}{' '}
                   <span className="text-xs bg-surface-container-highest px-1.5 py-0.5 rounded text-primary font-bold">
                     ({calculation.feePct}%)
                   </span>
@@ -469,30 +487,61 @@ export const CalculatorPage: React.FC = () => {
                 <span className="font-semibold text-on-surface">{formatIdr(calculation.feeAmount)}</span>
               </div>
               <div className="flex justify-between text-text-secondary">
-                <span>Ongkir Tokyo ➔ Jakarta ({weightG}g)</span>
+                <span>
+                  {shippingMethod === 'express'
+                    ? 'Ongkir EMS Japan Post'
+                    : shippingMethod === 'cargo'
+                    ? 'Ongkir Air Cargo Terjadwal'
+                    : 'Ongkir Pos Udara Jepang'}{' '}
+                  ({weightG}g)
+                </span>
                 <span className="font-semibold text-on-surface">{formatIdr(calculation.shippingCost)}</span>
               </div>
               {calculation.packagingCost > 0 && (
                 <div className="flex justify-between text-text-secondary">
-                  <span>Armor Box &amp; Corner Guard</span>
+                  <span>{t('calcPage.packArm')}</span>
                   <span className="font-semibold text-on-surface">
                     {formatIdr(calculation.packagingCost)}
                   </span>
                 </div>
               )}
-              <div className="flex justify-between text-text-secondary">
-                <span>Ongkir Domestik ({selectedDestination?.name})</span>
-                <span className="font-semibold text-on-surface">
+              {/* Pajak & Bea Cukai Indonesia (PMK Kemenkeu) */}
+              <div className="p-3 bg-surface-container-low/70 rounded-xl border border-border-subtle/70 space-y-1">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-on-surface text-sm">Pajak & Bea Cukai ID</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      calculation.customsTaxAmount === 0
+                        ? 'bg-success-bg text-success-text'
+                        : 'bg-amber-100 text-amber-800'
+                    }`}>
+                      {calculation.customsTaxAmount === 0 ? 'BEBAS PAJAK' : `${calculation.customsTaxPct}% PMK`}
+                    </span>
+                  </div>
+                  <span className="font-bold text-on-surface shrink-0">
+                    {calculation.customsTaxAmount === 0 ? 'Rp 0' : formatIdr(calculation.customsTaxAmount)}
+                  </span>
+                </div>
+                <p className="text-[11px] text-text-secondary leading-tight">
+                  {calculation.customsTaxNote}
+                </p>
+              </div>
+
+              <div className="flex justify-between text-text-secondary items-baseline">
+                <span className="max-w-[70%]">
+                  {t('calcPage.invDomestic')} ({calculation.domesticKgUnits || 1} kg • {selectedDestination?.name?.replace(/\s*\([^)]*\)/, '')})
+                </span>
+                <span className="font-semibold text-on-surface shrink-0">
                   {formatIdr(calculation.domesticShippingCost)}
                 </span>
               </div>
               <div className="flex justify-between text-text-secondary">
-                <span>Handling &amp; Bubble Wrap Standar</span>
-                <span className="text-success-text font-semibold">GRATIS</span>
+                <span>{t('calcPage.invHandling')}</span>
+                <span className="text-success-text font-semibold">{t('calcPage.invFree')}</span>
               </div>
               <div className="flex justify-between text-text-secondary">
-                <span>Asuransi Kargo Penuh</span>
-                <span className="text-success-text font-semibold">TERMASUK</span>
+                <span>{t('calcPage.invInsurance')}</span>
+                <span className="text-success-text font-semibold">{t('calcPage.invIncluded')}</span>
               </div>
             </div>
 
@@ -500,14 +549,14 @@ export const CalculatorPage: React.FC = () => {
             <div className="p-4 bg-surface-container-low rounded-xl space-y-1 border border-border-subtle">
               <div className="flex justify-between items-baseline">
                 <span className="font-title-md text-label-md text-text-secondary font-bold">
-                  Total Estimasi Bersih
+                  {t('calcPage.invTotal')}
                 </span>
                 <span className="font-headline-lg text-2xl lg:text-3xl text-primary font-bold tabular-nums">
                   {formatIdr(calculation.totalCost + calculation.domesticShippingCost)}
                 </span>
               </div>
               <p className="text-[11px] text-text-secondary">
-                *Sudah termasuk biaya logistik internasional, pajak/cukai kargo resmi, dan kurir ke kotamu.
+                {t('calcPage.invNote')}
               </p>
             </div>
 
@@ -519,12 +568,12 @@ export const CalculatorPage: React.FC = () => {
               className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-4 bg-success text-white font-label-md text-label-md rounded-xl hover:bg-success-text shadow-[0_4px_16px_rgba(24,168,116,0.3)] transition-all font-bold"
             >
               <span className="material-symbols-outlined text-[22px]">chat</span>
-              <span>Kirim Rincian ke WhatsApp Shopper</span>
+              <span>{t('calcPage.invWaBtn')}</span>
             </a>
 
             <div className="flex items-center justify-center gap-2 text-label-sm font-label-sm text-text-secondary text-xs">
               <span className="material-symbols-outlined text-success text-[16px]">verified</span>
-              <span>Harga dikunci saat DP ditransfer tanpa biaya susulan</span>
+              <span>{t('calcPage.invLockNote')}</span>
             </div>
           </div>
         </div>

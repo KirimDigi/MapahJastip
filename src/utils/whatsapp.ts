@@ -11,13 +11,16 @@ export function generateQuoteWhatsAppUrl(
   priceJpy: number,
   category: string,
   totalEstIdr: number,
-  shippingMethod: string
+  shippingMethod: string,
+  customsTaxInfo?: string
 ): string {
+  const taxLine = customsTaxInfo ? `• Pajak & Bea Cukai: ${customsTaxInfo}\n` : '';
   const msg = `Halo Personal Shopper MapahJastip,\nSaya mau titip barang dari Jepang dengan estimasi rincian:\n\n` +
     `• Barang: ${productName || 'Custom Request'}\n` +
     `• Kategori: ${category}\n` +
     `• Harga Toko: ${formatJpy(priceJpy)}\n` +
     `• Pengiriman: ${shippingMethod}\n` +
+    taxLine +
     `• Total Estimasi Bersih: ${formatIdr(totalEstIdr)}\n\n` +
     `Mohon info ketersediaan slot kloter dan pengecekan toko fisiknya ya kak. Terima kasih!`;
   return generateWhatsAppUrl(msg);
@@ -30,5 +33,10 @@ export function generateGeneralConsultationUrl(): string {
 
 export function generateCustomLinkRequestUrl(urlOrName = ''): string {
   const msg = `Halo Admin MapahJastip! Saya punya link / incaran barang dari Jepang:\n${urlOrName}\nBisa bantu cek ketersediaan dan estimasi biayanya?`;
+  return generateWhatsAppUrl(msg);
+}
+
+export function generateResellerRegistrationUrl(): string {
+  const msg = `Halo Admin MapahJastip! Saya tertarik untuk mendaftar Program Reseller jastip Jepang.\nMohon informasi syarat, katalog harga khusus reseller, dan cara memulainya ya kak. Terima kasih!`;
   return generateWhatsAppUrl(msg);
 }

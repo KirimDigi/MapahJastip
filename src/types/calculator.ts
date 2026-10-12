@@ -3,6 +3,7 @@ export interface CategoryRate {
   name: string;
   feePct: number;
   estWeightG: number;
+  customsTaxPct?: number;
 }
 
 export type ShippingMethod = 'express' | 'regular' | 'handcarry' | 'cargo';
@@ -25,6 +26,10 @@ export interface CalculationResult {
   shippingRatePer100g: number;
   shippingCost: number;
   packagingCost: number;
+  customsTaxPct: number;
+  customsTaxAmount: number;
+  customsTaxNote: string;
   domesticShippingCost: number;
+  domesticKgUnits?: number;
   totalCost: number;
 }

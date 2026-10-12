@@ -4,7 +4,7 @@ const CACHE_KEY = 'mapah_jastip_jpy_rate';
 const CACHE_TIMESTAMP_KEY = 'mapah_jastip_jpy_timestamp';
 const CACHE_DATE_STR_KEY = 'mapah_jastip_jpy_datestr';
 const CACHE_SOURCE_KEY = 'mapah_jastip_jpy_source';
-const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 menit cache agar lebih responsif
+const CACHE_DURATION_MS = 60 * 1000; // 1 menit cache agar auto refresh selalu sinkron
 
 export interface ExchangeRateData {
   rate: number;

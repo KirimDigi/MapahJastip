@@ -3,105 +3,81 @@ import React from 'react';
 export const OmotenashiFlow: React.FC = () => {
   const steps = [
     {
-      kanji: '一',
-      stepNumber: 'Langkah 01',
-      title: 'Kirim Link / Foto Barang',
-      description:
-        'Kirimkan tautan e-commerce Jepang (Amazon JP, Rakuten, Mercari, Yahoo Auction) atau snapshot etalase toko fisik (Don Quijote, Matsumoto Kiyoshi, Pokemon Center).',
-      highlightTitle: 'Cek Stok & Kalkulasi',
-      highlightDesc: 'Shopper memvalidasi keaslian, ketersediaan, dan mengunci estimasi harga All-in.',
-      progressWidth: 'w-1/4',
+      icon: 'shopping_bag',
+      title: 'Pilih Produk',
+      desc: 'Cari produk yang ingin kamu titip.',
+      isHighlight: false,
     },
     {
-      kanji: '二',
-      stepNumber: 'Langkah 02',
-      title: 'Konfirmasi & Pembayaran DP',
-      description:
-        'Setelah rincian disepakati, bayar DP 50% atau pelunasan penuh melalui rekening terverifikasi (BCA, Mandiri, Virtual Account, atau QRIS instan).',
-      highlightTitle: 'Proteksi Kurs Terkunci',
-      highlightDesc: 'Nilai tukar JPY ke IDR dikunci tetap saat pembayaran. Tidak ada biaya siluman fluktuasi valuta.',
-      progressWidth: 'w-2/4',
+      icon: 'luggage',
+      title: 'Pilih Metode',
+      desc: 'Handcarry, Bagasi atau Cargo.',
+      isHighlight: false,
     },
     {
-      kanji: '三',
-      stepNumber: 'Langkah 03',
-      title: 'Belanja Langsung di Jepang',
-      description:
-        'Personal shopper kami mendatangi lokasi resmi di Tokyo atau checkout pesanan toko online dengan verifikasi struk resmi bersegel kasir Jepang.',
-      highlightTitle: 'Live Photo & Bukti Struk',
-      highlightDesc: 'Foto barang di rak toko fisik dan register receipt resmi dikirim langsung ke WhatsApp Anda.',
-      progressWidth: 'w-3/4',
+      icon: 'local_shipping',
+      title: 'Lakukan Pembayaran',
+      desc: 'Transfer / E-wallet.',
+      isHighlight: false,
     },
     {
-      kanji: '四',
-      stepNumber: 'Langkah 04',
-      title: 'Packing Ekstra & Kirim ke Rumah',
-      description:
-        'Barang dipacking dengan standar kargo Jepang (bubble wrap ganda & corner box guard), lalu diterbangkan dan dikirim ke depan pintu Anda.',
-      highlightTitle: 'Resi Domestik Aman',
-      highlightDesc: 'Paket diteruskan via kurir Paxel / JNE dengan asuransi kargo penuh bebas risiko.',
-      progressWidth: 'w-full',
+      icon: 'inventory_2',
+      title: 'Kami Belanjakan & Kirim',
+      desc: 'Pantau status di akun kamu.',
+      isHighlight: true,
     },
   ];
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-6 lg:px-12 py-16" id="langkah-belanja">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+    <section className="w-full max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-12 py-8 sm:py-14" id="langkah-belanja">
+      <div className="bg-surface-container-lowest rounded-3xl p-6 sm:p-10 border border-border-subtle/80 shadow-xs space-y-8">
+        {/* Header */}
         <div>
-          <span className="font-label-md text-label-md text-tertiary-container uppercase tracking-wider block mb-1 font-bold">
-            Panduan Alur Layanan
-          </span>
-          <h2 className="font-headline-md text-headline-md text-on-surface">
-            Proses 4 Langkah Omotenashi
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-on-surface tracking-tight">
+            Cara Order di <span className="text-primary">MapahJastip.id</span>
           </h2>
+          <p className="text-xs sm:text-sm text-text-secondary mt-1 font-medium">
+            Mudah, aman, dan transparan.
+          </p>
         </div>
-        <p className="font-body-md text-body-md text-text-secondary max-w-md">
-          Setiap pesanan diawasi personal shopper bersertifikasi dengan standar kehati-hatian khas logistik Jepang.
-        </p>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {steps.map((st, i) => (
-          <div
-            key={i}
-            className="group relative bg-surface-container-lowest rounded-2xl p-6 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between border border-border-subtle/80 space-y-4"
-          >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="w-10 h-10 rounded-xl bg-surface-light-blue text-primary font-headline-md text-xl flex items-center justify-center font-bold border border-border-subtle">
-                  {st.kanji}
-                </span>
-                <span className="font-label-sm text-label-sm text-text-secondary uppercase tracking-widest font-semibold">
-                  {st.stepNumber}
+        {/* 4 Steps Horizontal Flow */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 relative">
+          {steps.map((st, idx) => (
+            <div key={idx} className="relative flex flex-col items-center text-center group">
+              {/* Step Icon Circle */}
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-blue-50/80 border border-blue-100 flex items-center justify-center text-primary shadow-xs group-hover:scale-105 group-hover:bg-blue-100/70 transition-all duration-300 mb-3.5">
+                <span className="material-symbols-outlined text-[32px] sm:text-[40px] text-primary">
+                  {st.icon}
                 </span>
               </div>
 
-              <div className="space-y-1">
-                <h3 className="font-headline-sm text-lg text-on-surface font-bold group-hover:text-primary transition-colors">
+              {/* Title & Description */}
+              <div className="space-y-1 max-w-[200px]">
+                <h3
+                  className={`font-bold text-sm sm:text-base leading-snug ${
+                    st.isHighlight ? 'text-primary' : 'text-on-surface'
+                  }`}
+                >
                   {st.title}
                 </h3>
-                <p className="font-body-sm text-xs text-text-secondary leading-relaxed">
-                  {st.description}
+                <p className="text-xs text-text-secondary leading-relaxed">
+                  {st.desc}
                 </p>
               </div>
 
-              <div className="bg-surface-container-low p-3 rounded-xl text-text-secondary font-body-sm space-y-1 border border-border-subtle/50">
-                <p className="font-label-sm text-xs text-on-surface font-semibold flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-primary text-[15px]">verified</span>
-                  {st.highlightTitle}
-                </p>
-                <p className="text-[11px] leading-relaxed">{st.highlightDesc}</p>
-              </div>
+              {/* Connector Arrow (Visible between items on Desktop) */}
+              {idx < steps.length - 1 && (
+                <div className="hidden lg:flex absolute top-7 -right-3 sm:-right-4 text-primary/40 pointer-events-none">
+                  <span className="material-symbols-outlined text-[28px]">chevron_right</span>
+                </div>
+              )}
             </div>
-
-            <div className="pt-2 mt-auto">
-              <div className="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
-                <div className={`bg-primary h-full rounded-full ${st.progressWidth}`} />
-              </div>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
 };
+
+

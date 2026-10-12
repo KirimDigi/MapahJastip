@@ -1,34 +1,118 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { PaymentMethod, PaymentStatus, Order } from '../types/order';
+import { ShippingMethod } from '../types/calculator';
 import { formatIdr } from '../utils/currency';
-import { DESTINATION_ZONES } from '../constants/rates';
+import {
+  DESTINATION_ZONES,
+  AIR_EXPRESS_RATE_PER_100G,
+  AIR_REGULAR_RATE_PER_100G,
+  CARGO_EXPRESS_RATE_PER_100G,
+} from '../constants/rates';
+import { useLanguage } from '../context/LanguageContext';
+import { supabase } from '../services/supabase';
 
 export const CheckoutPage: React.FC = () => {
+  const { t } = useLanguage();
+  const { user } = useAuth();
   const { items, totalPriceIdr, clearCart } = useCart();
   const navigate = useNavigate();
 
-  // Form states
-  const [fullName, setFullName] = useState('Dinda Pratiwi');
-  const [email, setEmail] = useState('dinda.pratiwi@example.com');
-  const [phone, setPhone] = useState('081280905425');
+  // Form states — Otomatis terisi sesuai akun customer yang sedang login
+  const [fullName, setFullName] = useState(user?.name || '');
+  const [phone, setPhone] = useState(user?.phone || '');
   const [cityZoneId, setCityZoneId] = useState('jabodetabek');
   const [postalCode, setPostalCode] = useState('12310');
   const [address, setAddress] = useState('Jl. Metro Pondok Indah Blok TB No. 12, Kebayoran Lama');
-  const [shippingType, setShippingType] = useState<'handcarry' | 'cargo'>('handcarry');
+  const [shippingType, setShippingType] = useState<ShippingMethod>('express');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('bca');
   const [notes, setNotes] = useState('');
 
-  // Order created state
-  const [createdOrder, setCreatedOrder] = useState<Order | null>(null);
+  // Sinkronisasi otomatis data akun login ke form
+  useEffect(() => {
+    if (user) {
+      if (!fullName) setFullName(user.name || '');
+      if (!phone) setPhone(user.phone || '');
+    }
+  }, [user]);
+
+  // Order created state — disimpan di sessionStorage agar tidak hilang saat halaman direload
+  const [createdOrder, setCreatedOrder] = useState<Order | null>(() => {
+    try {
+      const saved = sessionStorage.getItem('mapah_last_checkout_order');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('pending');
 
+  const totalWeightG = useMemo(() => {
+    return items.reduce((sum, item) => sum + (item.product.weightG || 350) * item.quantity, 0);
+  }, [items]);
+
+  const effectiveWeightG = Math.max(100, totalWeightG);
+  const shippingCosts = useMemo(() => {
+    return {
+      express: Math.round((effectiveWeightG / 100) * AIR_EXPRESS_RATE_PER_100G),
+      cargo: Math.round((effectiveWeightG / 100) * CARGO_EXPRESS_RATE_PER_100G),
+      regular: Math.round((effectiveWeightG / 100) * AIR_REGULAR_RATE_PER_100G),
+    };
+  }, [effectiveWeightG]);
+
+  const shippingOptionsList: { id: ShippingMethod; title: string; subtitle: string; badge: string; cost: number }[] = [
+    {
+      id: 'express',
+      title: '✈️ EMS Japan Post Express',
+      subtitle: 'Direct Tokyo ➔ Indonesia (3-5 hari kerja)',
+      badge: 'Rp 25.000 / 100g',
+      cost: shippingCosts.express,
+    },
+    {
+      id: 'cargo',
+      title: '🚢 Air Cargo Terjadwal',
+      subtitle: 'Kargo Udara All-in Cukai (7-10 hari kerja)',
+      badge: 'Rp 24.000 / 100g',
+      cost: shippingCosts.cargo,
+    },
+    {
+      id: 'regular',
+      title: '📦 Reguler Pos Udara Jepang',
+      subtitle: 'Air Parcel Tokyo (7-10 hari kerja)',
+      badge: 'Rp 16.500 / 100g',
+      cost: shippingCosts.regular,
+    },
+  ];
+
+  const currentShippingInfo = shippingOptionsList.find((s) => s.id === shippingType) || shippingOptionsList[0];
+
   const selectedZone = DESTINATION_ZONES.find((z) => z.id === cityZoneId) || DESTINATION_ZONES[0];
-  const shippingFee = shippingType === 'handcarry' ? 65000 : 45000;
-  const domesticFee = selectedZone.ratePerKg;
+  const shippingFee = (shippingCosts as any)[shippingType] || shippingCosts.express;
+  const domesticKgUnits = Math.max(1, Math.ceil(Math.max(0, totalWeightG - 300) / 1000));
+  const domesticFee = domesticKgUnits * selectedZone.ratePerKg;
   const jastipFee = Math.round(totalPriceIdr * 0.1); // ~10%
-  const grandTotal = totalPriceIdr + jastipFee + shippingFee + domesticFee;
+
+  // Kalkulasi Pajak & Bea Cukai Indonesia sesuai komoditas barang
+  const customsTaxAmount = useMemo(() => {
+    // Bebas bea masuk impor personal sampai batas wajar (de minimis)
+    if (totalPriceIdr <= 3000000) return 0;
+    let totalTax = 0;
+    items.forEach((it) => {
+      const cat = (it.product.category || '').toLowerCase();
+      let taxPct = 17.5; // standar PPN + Bea Masuk impor umum
+      if (cat.includes('sepatu') || cat.includes('footwear') || cat.includes('sneaker')) {
+        taxPct = 35;
+      } else if (cat.includes('tas') || cat.includes('bag') || cat.includes('pakaian') || cat.includes('fashion') || cat.includes('baju')) {
+        taxPct = 25;
+      }
+      totalTax += Math.round((it.product.priceIdr * it.quantity) * (taxPct / 100));
+    });
+    return totalTax;
+  }, [items, totalPriceIdr]);
+
+  const grandTotal = totalPriceIdr + jastipFee + shippingFee + domesticFee + customsTaxAmount;
 
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,26 +125,98 @@ export const CheckoutPage: React.FC = () => {
       createdAt: new Date().toISOString(),
       customer: {
         fullName,
-        email,
+        email: '-',
         phone,
         city: selectedZone.name,
         postalCode,
         address,
       },
       items,
-      shippingMethod: shippingType === 'handcarry' ? 'Air Cargo Handcarry' : 'Cargo Express Terjadwal',
+      shippingMethod: currentShippingInfo.title,
       subtotalIdr: totalPriceIdr,
       jastipFeeIdr: jastipFee,
       shippingCostIdr: shippingFee + domesticFee,
+      customsTaxIdr: customsTaxAmount,
       totalAmountIdr: grandTotal,
       paymentMethod,
       paymentStatus: 'pending',
       notes,
     };
 
+    const customerName = fullName.trim() || user?.name || 'Pelanggan MapahJastip';
+    const customerPhone = phone.trim().replace(/\D/g, '') || (user?.phone ? user.phone.replace(/\D/g, '') : '');
+    const customerEmail = user?.email || null;
+
     setCreatedOrder(newOrder);
     setPaymentStatus('pending');
+    try {
+      sessionStorage.setItem('mapah_last_checkout_order', JSON.stringify(newOrder));
+    } catch {
+      // ignore
+    }
     clearCart();
+
+    // Simpan pesanan asli pelanggan ke sistem penyimpanan lokal (mapah_admin_orders)
+    try {
+      const adminFormattedOrder = {
+        id: newOrder.id,
+        orderNumber: newOrder.orderNumber,
+        date: new Date().toLocaleDateString('id-ID', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        customerName,
+        customerPhone,
+        customerEmail,
+        customerCity: selectedZone.name,
+        customerAddress: address,
+        items: items.map((it) => `${it.product.name} (${it.quantity}x)`).join(', '),
+        totalIdr: grandTotal,
+        status: 'pending',
+        courier: currentShippingInfo.title.replace(/[^\w\s]/gi, '').trim(),
+        resiNumber: '',
+        paymentMethod,
+        paymentStatus: 'pending',
+        notes,
+      };
+
+      const existing = localStorage.getItem('mapah_admin_orders');
+      const orderList = existing ? JSON.parse(existing) : [];
+      // Hilangkan dummy order lama jika ada
+      const cleanList = orderList.filter((o: any) => !['ord-101', 'ord-102', 'ord-103', 'ord-104', 'ord-105'].includes(o.id));
+      localStorage.setItem('mapah_admin_orders', JSON.stringify([adminFormattedOrder, ...cleanList]));
+
+      // Simpan langsung ke database Supabase Cloud
+      supabase.from('orders').insert([
+        {
+          order_number: newOrder.orderNumber,
+          customer_name: customerName,
+          customer_phone: customerPhone,
+          customer_email: customerEmail,
+          customer_address: address,
+          batch_name: currentShippingInfo.title,
+          origin: 'Tokyo, Jepang 🇯🇵',
+          destination: selectedZone.name,
+          courier: currentShippingInfo.title.replace(/[^\w\s]/gi, '').trim(),
+          resi_number: '',
+          order_status: '1. Menunggu Belanja di Tokyo',
+          progress_percent: 25,
+          est_arrival: shippingType === 'handcarry' || shippingType === 'express' ? '3-5 Hari Kerja' : '7-10 Hari Kerja',
+          items: items.map((it) => `${it.product.name} (${it.quantity}x)`).join(', '),
+          total_amount: grandTotal,
+          payment_method: paymentMethod,
+          payment_status: 'pending',
+          notes: notes || '',
+        },
+      ]).then(({ error }) => {
+        if (error) console.warn('Supabase insert order warning:', error.message);
+      });
+    } catch (err) {
+      console.error('Failed to save real order to localStorage/Supabase:', err);
+    }
   };
 
   // Simulated Payment Confirmation (Architecture boundary: In production this will be triggered by Moota webhook on backend)
@@ -71,6 +227,26 @@ export const CheckoutPage: React.FC = () => {
         ...createdOrder,
         paymentStatus: status,
       });
+
+      // Update status pembayaran pesanan di admin
+      try {
+        const existing = localStorage.getItem('mapah_admin_orders');
+        if (existing) {
+          const orderList = JSON.parse(existing);
+          const updated = orderList.map((o: any) =>
+            o.orderNumber === createdOrder.orderNumber
+              ? {
+                  ...o,
+                  paymentStatus: status,
+                  status: status === 'paid' ? 'purchased' : o.status,
+                }
+              : o
+          );
+          localStorage.setItem('mapah_admin_orders', JSON.stringify(updated));
+        }
+      } catch (err) {
+        console.error('Failed to update order status in localStorage:', err);
+      }
     }
   };
 
@@ -216,17 +392,22 @@ export const CheckoutPage: React.FC = () => {
 
             <div className="flex justify-between items-center pt-2">
               <Link
-                to="/status-pesanan"
-                className="px-5 py-2.5 bg-primary-container text-white rounded-xl text-xs font-bold hover:bg-primary-dark shadow-xs"
+                to={`/status-pesanan?order=${createdOrder.orderNumber}`}
+                className="px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-bold hover:bg-primary-dark shadow-xs flex items-center gap-1.5"
               >
-                Lihat di Status Pesanan
+                <span className="material-symbols-outlined text-[15px]">local_shipping</span>
+                <span>Lacak di Status Pesanan</span>
               </Link>
-              <Link
-                to="/"
-                className="px-4 py-2.5 text-xs text-text-secondary hover:text-primary font-semibold"
+              <button
+                type="button"
+                onClick={() => {
+                  sessionStorage.removeItem('mapah_last_checkout_order');
+                  navigate('/');
+                }}
+                className="px-4 py-2.5 text-xs text-text-secondary hover:text-primary font-semibold cursor-pointer"
               >
-                Kembali ke Beranda
-              </Link>
+                Selesai &amp; Beranda
+              </button>
             </div>
           </div>
         </div>
@@ -263,7 +444,7 @@ export const CheckoutPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10 space-y-8">
         <div>
           <h1 className="font-headline-lg text-3xl lg:text-headline-lg text-on-surface font-bold">
-            Formulir Checkout Titipan
+            {t('checkoutPage.title')}
           </h1>
           <p className="text-text-secondary text-sm">
             Lengkapi data pengiriman dan konfirmasi pemesanan jasa titip belanja Jepang.
@@ -279,7 +460,7 @@ export const CheckoutPage: React.FC = () => {
                 <span className="w-6 h-6 rounded-full bg-primary-container text-white text-xs flex items-center justify-center font-bold">
                   1
                 </span>
-                Informasi Pemesan
+                {t('checkoutPage.step1')}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
@@ -309,19 +490,6 @@ export const CheckoutPage: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-on-surface block" htmlFor="c-email">
-                  Email Notifikasi Invoice
-                </label>
-                <input
-                  id="c-email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-surface-container-low rounded-xl text-sm focus:ring-2 focus:ring-primary border border-border-subtle/50"
-                />
-              </div>
             </div>
 
             {/* Section 2: Address */}
@@ -330,22 +498,22 @@ export const CheckoutPage: React.FC = () => {
                 <span className="w-6 h-6 rounded-full bg-primary-container text-white text-xs flex items-center justify-center font-bold">
                   2
                 </span>
-                Alamat Pengiriman di Indonesia
+                {t('checkoutPage.step2')}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-on-surface block" htmlFor="c-zone">
-                    Wilayah Tujuan
+                    Wilayah Tujuan Pengiriman Domestik
                   </label>
                   <select
                     id="c-zone"
                     value={cityZoneId}
                     onChange={(e) => setCityZoneId(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-surface-container-low rounded-xl text-sm focus:ring-2 focus:ring-primary border border-border-subtle/50 cursor-pointer"
+                    className="w-full px-4 py-2.5 bg-surface-container-low rounded-xl text-sm focus:ring-2 focus:ring-primary border border-border-subtle/50 cursor-pointer font-medium"
                   >
                     {DESTINATION_ZONES.map((zone) => (
                       <option key={zone.id} value={zone.id}>
-                        {zone.name} (+{formatIdr(zone.ratePerKg)}/kg)
+                        {zone.name} ({formatIdr(zone.ratePerKg)} / kg)
                       </option>
                     ))}
                   </select>
@@ -381,59 +549,63 @@ export const CheckoutPage: React.FC = () => {
 
             {/* Section 3: Shipping & Payment Method */}
             <div className="space-y-4 pt-4 border-t border-border-subtle">
-              <h2 className="font-title-md text-base text-on-surface font-bold flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-primary-container text-white text-xs flex items-center justify-center font-bold">
-                  3
+              <div className="flex items-center justify-between">
+                <h2 className="font-title-md text-base text-on-surface font-bold flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-primary-container text-white text-xs flex items-center justify-center font-bold">
+                    3
+                  </span>
+                  {t('checkoutPage.step3')}
+                </h2>
+                <span className="text-xs text-text-secondary bg-surface-container-low px-2.5 py-1 rounded-full font-medium">
+                  Total Berat Paket: <strong className="text-primary">{totalWeightG} gram</strong>
                 </span>
-                Metode Pengiriman &amp; Pembayaran
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label
-                  onClick={() => setShippingType('handcarry')}
-                  className={`p-3.5 rounded-xl border cursor-pointer flex items-center justify-between text-xs ${
-                    shippingType === 'handcarry'
-                      ? 'bg-surface-light-blue border-primary'
-                      : 'bg-surface-container-low border-transparent'
-                  }`}
-                >
-                  <div>
-                    <span className="font-bold text-on-surface block">Air Cargo Handcarry</span>
-                    <span className="text-text-secondary">Tiba 4-7 hari kerja</span>
-                  </div>
-                  <span className="font-bold text-primary">Rp 65.000</span>
-                </label>
-                <label
-                  onClick={() => setShippingType('cargo')}
-                  className={`p-3.5 rounded-xl border cursor-pointer flex items-center justify-between text-xs ${
-                    shippingType === 'cargo'
-                      ? 'bg-surface-light-blue border-primary'
-                      : 'bg-surface-container-low border-transparent'
-                  }`}
-                >
-                  <div>
-                    <span className="font-bold text-on-surface block">Cargo Express Terjadwal</span>
-                    <span className="text-text-secondary">Tiba 8-12 hari kerja</span>
-                  </div>
-                  <span className="font-bold text-primary">Rp 45.000</span>
-                </label>
+              </div>
+
+              {/* Pilihan Metode Pengiriman Resmi */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {shippingOptionsList.map((opt) => (
+                  <label
+                    key={opt.id}
+                    onClick={() => setShippingType(opt.id)}
+                    className={`p-3.5 rounded-xl border cursor-pointer flex items-center justify-between text-xs transition-all ${
+                      shippingType === opt.id
+                        ? 'bg-surface-light-blue border-primary shadow-xs ring-1 ring-primary'
+                        : 'bg-surface-container-low border-transparent hover:border-border-subtle'
+                    }`}
+                  >
+                    <div className="space-y-0.5">
+                      <span className="font-bold text-on-surface block text-sm">{opt.title}</span>
+                      <span className="text-text-secondary text-[11px] block">{opt.subtitle}</span>
+                      <span className="text-[10px] text-primary font-bold bg-surface-container-highest px-1.5 py-0.5 rounded inline-block">
+                        {opt.badge}
+                      </span>
+                    </div>
+                    <span className="font-bold text-primary whitespace-nowrap ml-2 text-sm">{formatIdr(opt.cost)}</span>
+                  </label>
+                ))}
               </div>
 
               {/* Payment selector */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
-                {(['bca', 'mandiri', 'qris', 'jenius'] as PaymentMethod[]).map((pm) => (
-                  <button
-                    key={pm}
-                    type="button"
-                    onClick={() => setPaymentMethod(pm)}
-                    className={`p-3 rounded-xl border text-xs font-bold uppercase transition-all ${
-                      paymentMethod === pm
-                        ? 'bg-primary-container text-white border-primary shadow-xs'
-                        : 'bg-surface-container-low text-on-surface border-border-subtle hover:bg-surface-soft-blue'
-                    }`}
-                  >
-                    {pm}
-                  </button>
-                ))}
+              <div className="pt-2">
+                <label className="text-xs font-semibold text-on-surface block mb-2">
+                  Pilih Saluran Pembayaran:
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {(['bca', 'mandiri', 'qris', 'jenius'] as PaymentMethod[]).map((pm) => (
+                    <button
+                      key={pm}
+                      type="button"
+                      onClick={() => setPaymentMethod(pm)}
+                      className={`p-3 rounded-xl border text-xs font-bold uppercase transition-all cursor-pointer ${
+                        paymentMethod === pm
+                          ? 'bg-primary-container text-white border-primary shadow-xs'
+                          : 'bg-surface-container-low text-on-surface border-border-subtle hover:bg-surface-soft-blue'
+                      }`}
+                    >
+                      {pm}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -454,9 +626,17 @@ export const CheckoutPage: React.FC = () => {
 
           {/* Cart Summary & Total (Col 8-12) */}
           <div className="lg:col-span-5 bg-surface-container-lowest p-6 md:p-8 rounded-3xl border border-border-subtle shadow-lg space-y-6 sticky top-28">
-            <h2 className="font-title-md text-base text-on-surface font-bold border-b border-border-subtle pb-3">
-              Ringkasan Titipan ({items.length} Item)
-            </h2>
+            <div className="flex items-center justify-between border-b border-border-subtle pb-3">
+              <div>
+                <h2 className="font-title-md text-base text-on-surface font-bold">
+                  Ringkasan Titipan ({items.length} Item)
+                </h2>
+                <span className="text-xs text-text-secondary">Est. Berat: {totalWeightG}g</span>
+              </div>
+              <span className="inline-flex items-center gap-1 font-label-sm text-xs text-success-text bg-success-bg px-2.5 py-1 rounded-full font-bold">
+                <span className="material-symbols-outlined text-[14px]">shield</span> All-in Safe
+              </span>
+            </div>
 
             <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
               {items.map((item) => (
@@ -471,7 +651,7 @@ export const CheckoutPage: React.FC = () => {
                       {item.product.name}
                     </span>
                     <span className="text-text-secondary">
-                      {item.quantity} x {formatIdr(item.product.priceIdr)}
+                      {item.quantity} x {formatIdr(item.product.priceIdr)} ({item.product.weightG || 350}g)
                     </span>
                   </div>
                   <span className="font-bold text-on-surface shrink-0">
@@ -482,25 +662,50 @@ export const CheckoutPage: React.FC = () => {
             </div>
 
             <div className="space-y-2 border-t border-border-subtle pt-4 text-xs text-text-secondary font-medium">
-              <div className="flex justify-between">
-                <span>Subtotal Barang:</span>
-                <span className="text-on-surface font-semibold">{formatIdr(totalPriceIdr)}</span>
+              <div className="flex justify-between items-center gap-3">
+                <span className="min-w-0">Subtotal Barang:</span>
+                <span className="text-on-surface font-semibold whitespace-nowrap shrink-0">{formatIdr(totalPriceIdr)}</span>
               </div>
-              <div className="flex justify-between">
-                <span>Fee Jastip Concierge (~10%):</span>
-                <span className="text-on-surface font-semibold">{formatIdr(jastipFee)}</span>
+              <div className="flex justify-between items-center gap-3">
+                <span className="min-w-0">Fee Jastip Concierge (~10%):</span>
+                <span className="text-on-surface font-semibold whitespace-nowrap shrink-0">{formatIdr(jastipFee)}</span>
               </div>
-              <div className="flex justify-between">
-                <span>Ongkir Udara Tokyo ➔ Jakarta:</span>
-                <span className="text-on-surface font-semibold">{formatIdr(shippingFee)}</span>
+              <div className="flex justify-between items-center gap-3">
+                <span className="min-w-0">
+                  {currentShippingInfo.title} ({totalWeightG}g):
+                </span>
+                <span className="text-on-surface font-semibold whitespace-nowrap shrink-0">{formatIdr(shippingFee)}</span>
               </div>
-              <div className="flex justify-between">
-                <span>Kurir Domestik ({selectedZone.name}):</span>
-                <span className="text-on-surface font-semibold">{formatIdr(domesticFee)}</span>
+              <div className="flex justify-between items-start gap-3">
+                <span className="flex-1 min-w-0">Kurir Domestik ({domesticKgUnits} kg • {selectedZone.name}):</span>
+                <span className="text-on-surface font-semibold whitespace-nowrap shrink-0 text-right">{formatIdr(domesticFee)}</span>
               </div>
-              <div className="border-t border-border-subtle pt-3 flex justify-between items-baseline">
+              <div className="flex justify-between items-center gap-3 py-1.5 px-2 bg-surface-container-low rounded-lg border border-border-subtle/50">
+                <span className="flex items-center gap-1.5 min-w-0">
+                  <span className="font-semibold text-on-surface">Pajak &amp; Bea Cukai ID:</span>
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${
+                    customsTaxAmount === 0
+                      ? 'bg-success-bg text-success-text'
+                      : 'bg-amber-100 text-amber-800'
+                  }`}>
+                    {customsTaxAmount === 0 ? 'Bebas Bea Masuk' : 'Tarif PMK Bea Cukai'}
+                  </span>
+                </span>
+                <span className="text-on-surface font-bold whitespace-nowrap shrink-0 text-right">
+                  {customsTaxAmount === 0 ? 'Rp\u00A00' : formatIdr(customsTaxAmount)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center gap-3">
+                <span className="min-w-0">Handling &amp; Bubble Wrap Tebal:</span>
+                <span className="text-success-text font-semibold whitespace-nowrap shrink-0">GRATIS</span>
+              </div>
+              <div className="flex justify-between items-center gap-3">
+                <span className="min-w-0">Asuransi Kargo Penuh:</span>
+                <span className="text-success-text font-semibold whitespace-nowrap shrink-0">TERMASUK</span>
+              </div>
+              <div className="border-t border-border-subtle pt-3 flex justify-between items-baseline gap-3">
                 <span className="font-bold text-sm text-on-surface">Total Pembayaran:</span>
-                <span className="font-headline-sm text-xl text-primary font-bold tabular-nums">
+                <span className="font-headline-lg text-2xl text-primary font-bold tabular-nums whitespace-nowrap shrink-0 text-right">
                   {formatIdr(grandTotal)}
                 </span>
               </div>
@@ -508,7 +713,7 @@ export const CheckoutPage: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full py-4 bg-primary-container hover:bg-primary-dark text-white font-label-md rounded-xl shadow-md transition-all font-bold flex items-center justify-center gap-2"
+              className="w-full py-4 bg-primary-container hover:bg-primary-dark text-white font-label-md rounded-xl shadow-md transition-all font-bold flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Konfirmasi &amp; Dapatkan Kode Bayar</span>
               <span className="material-symbols-outlined text-[19px]">arrow_forward</span>

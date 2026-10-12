@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { generateWhatsAppUrl } from '../utils/whatsapp';
+import { useLanguage } from '../context/LanguageContext';
 
 export const ConsultationPage: React.FC = () => {
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [itemQuery, setItemQuery] = useState('');
   const [storeLocation, setStoreLocation] = useState('Tokyo (Shibuya/Ginza/Akihabara)');
@@ -23,13 +25,13 @@ export const ConsultationPage: React.FC = () => {
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-light-blue text-primary font-label-md text-xs font-semibold">
             <span className="material-symbols-outlined text-[16px]">support_agent</span>
-            100% Gratis Tanpa Komitmen
+            {t('consult.badge')}
           </div>
           <h1 className="font-headline-lg text-3xl sm:text-4xl text-on-surface font-bold">
-            Konsultasi Gratis / Hubungi Personal Shopper
+            {t('consult.title')}
           </h1>
           <p className="font-body-md text-body-md text-text-secondary leading-relaxed max-w-2xl mx-auto">
-            Ingin titip barang yang tidak ada di katalog? Bingung mencari ukuran sepatu, lelang Mercari, atau ketersediaan di toko fisik Tokyo? Diskusikan langsung dengan tim concierge kami!
+            {t('consult.desc')}
           </p>
         </div>
 

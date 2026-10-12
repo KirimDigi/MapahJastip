@@ -4,6 +4,7 @@ import { AnnouncementBar } from './AnnouncementBar';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { CartDrawer } from '../cart/CartDrawer';
+import { CartToastNotification } from '../cart/CartToastNotification';
 import { MobileBottomNav } from './MobileBottomNav';
 import { FloatingWhatsApp } from '../common/FloatingWhatsApp';
 
@@ -17,6 +18,7 @@ export const MainLayout: React.FC = () => {
       </main>
       <Footer />
       <CartDrawer />
+      <CartToastNotification />
       <FloatingWhatsApp />
       <MobileBottomNav />
     </div>

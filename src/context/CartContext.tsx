@@ -1,32 +1,103 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Product } from '../types/product';
 import { CartItem, CartContextType } from '../types/cart';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const CART_STORAGE_KEY = 'mapah_jastip_cart_v1';
+const GUEST_STORAGE_KEY = 'mapah_jastip_cart_guest';
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
+  const prevUserRef = useRef<typeof user>(user);
+
+  const getStorageKey = (email?: string) => {
+    return email ? `mapah_jastip_cart_${email}` : GUEST_STORAGE_KEY;
+  };
+
   const [items, setItems] = useState<CartItem[]>(() => {
     try {
-      const stored = localStorage.getItem(CART_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
+      if (user?.email) {
+        const userStored = localStorage.getItem(`mapah_jastip_cart_${user.email}`);
+        if (userStored) return JSON.parse(userStored);
+        return [];
+      } else {
+        const guestStored = localStorage.getItem(GUEST_STORAGE_KEY);
+        if (guestStored) return JSON.parse(guestStored);
+        // Hapus cache cart lama agar tidak tertinggal setelah logout akun
+        localStorage.removeItem('mapah_jastip_cart_v1');
+        return [];
+      }
     } catch {
       return [];
     }
   });
 
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
 
+  const clearNotification = () => {
+    setLastAddedItem(null);
+  };
+
+  // Sinkronisasi keranjang saat login / logout
+  useEffect(() => {
+    const prevUser = prevUserRef.current;
+    prevUserRef.current = user;
+
+    // 1. Pengguna logout: kosongkan keranjang aktif & bersihkan guest storage
+    if (prevUser && !user) {
+      setItems([]);
+      try {
+        localStorage.removeItem(GUEST_STORAGE_KEY);
+        localStorage.removeItem('mapah_jastip_cart_v1');
+      } catch (e) {
+        console.warn('Failed to clear guest cart', e);
+      }
+      return;
+    }
+
+    // 2. Pengguna baru login: muat keranjang milik akun tersebut
+    if (!prevUser && user) {
+      const userKey = getStorageKey(user.email);
+      try {
+        const userStored = localStorage.getItem(userKey);
+        if (userStored) {
+          setItems(JSON.parse(userStored));
+        } else {
+          // Jika tamu belum punya simpanan keranjang, reset ke kosong
+          setItems([]);
+        }
+      } catch {
+        setItems([]);
+      }
+      return;
+    }
+
+    // 3. Ganti akun
+    if (user && prevUser && user.email !== prevUser.email) {
+      const userKey = getStorageKey(user.email);
+      try {
+        const userStored = localStorage.getItem(userKey);
+        setItems(userStored ? JSON.parse(userStored) : []);
+      } catch {
+        setItems([]);
+      }
+    }
+  }, [user]);
+
+  // Simpan keranjang ke key yang sesuai setiap ada perubahan item
   useEffect(() => {
     try {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+      const key = getStorageKey(user?.email);
+      localStorage.setItem(key, JSON.stringify(items));
     } catch (e) {
       console.warn('Failed to save cart to localStorage', e);
     }
-  }, [items]);
+  }, [items, user]);
 
   const addToCart = (product: Product, quantity = 1, variant?: string, notes?: string) => {
+    const newItem: CartItem = { product, quantity, selectedVariant: variant, notes };
     setItems((prevItems) => {
       const existingIndex = prevItems.findIndex(
         (item) => item.product.id === product.id && item.selectedVariant === variant
@@ -39,10 +110,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
         return next;
       } else {
-        return [...prevItems, { product, quantity, selectedVariant: variant, notes }];
+        return [...prevItems, newItem];
       }
     });
-    setIsCartOpen(true);
+    // Trigger added notification toast
+    setLastAddedItem(newItem);
   };
 
   const removeFromCart = (productId: string) => {
@@ -84,6 +156,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         totalPriceIdr,
         isCartOpen,
         setIsCartOpen,
+        lastAddedItem,
+        clearNotification,
       }}
     >
       {children}

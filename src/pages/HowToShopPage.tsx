@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { OmotenashiFlow } from '../components/guide/OmotenashiFlow';
 import { useExchangeRate } from '../context/ExchangeRateContext';
+import { useLanguage } from '../context/LanguageContext';
 import { generateGeneralConsultationUrl } from '../utils/whatsapp';
 
 export const HowToShopPage: React.FC = () => {
   const { rate } = useExchangeRate();
+  const { t } = useLanguage();
   const [trackNumber, setTrackNumber] = useState('');
   const [trackResult, setTrackResult] = useState<string | null>(null);
 
@@ -33,14 +35,14 @@ export const HowToShopPage: React.FC = () => {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-light-blue text-primary shadow-xs border border-primary/20">
                 <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse" />
                 <span className="font-label-sm text-xs font-semibold tracking-wide uppercase">
-                  Alur Mudah &amp; Transparan
+                  {t('how.badge')}
                 </span>
               </div>
               <h1 className="font-headline-lg text-4xl lg:text-headline-lg text-on-surface tracking-tight leading-tight">
-                Cara Kerja &amp; Alur Titip Belanja dari Jepang
+                {t('how.title')}
               </h1>
               <p className="font-body-lg text-body-lg text-text-secondary leading-relaxed">
-                Hanya butuh 4 langkah mudah dari request barang hingga paket tiba dengan selamat di depan pintu rumah Anda tanpa kerumitan bea cukai.
+                {t('how.desc')}
               </p>
               <div className="pt-2 flex flex-wrap items-center gap-4">
                 <a
@@ -48,14 +50,14 @@ export const HowToShopPage: React.FC = () => {
                   className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary-container text-on-primary-container font-label-md text-sm shadow-md hover:bg-primary-dark transition-all font-semibold"
                 >
                   <span className="material-symbols-outlined text-[20px]">search_check</span>
-                  Lacak Pesanan Anda
+                  {t('how.trackCta')}
                 </a>
                 <a
                   href="#langkah-belanja"
                   className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-surface-container-lowest text-primary font-label-md text-sm shadow-xs hover:bg-surface-light-blue transition-all border border-border-subtle font-semibold"
                 >
                   <span className="material-symbols-outlined text-[20px]">explore</span>
-                  Pelajari 4 Langkah
+                  {t('how.learnCta')}
                 </a>
               </div>
             </div>
@@ -66,27 +68,27 @@ export const HowToShopPage: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary text-[24px]">flight_takeoff</span>
                   <span className="font-title-md text-title-md text-on-surface font-bold">
-                    Batch Tokyo Terjadwal
+                    {t('how.batchTitle')}
                   </span>
                 </div>
                 <span className="font-label-sm text-xs px-2.5 py-0.5 rounded-full bg-success-bg text-success-text font-bold">
-                  Slot Terbuka
+                  {t('how.batchOpen')}
                 </span>
               </div>
               <div className="bg-surface-container-low p-3.5 rounded-xl space-y-1.5 border border-border-subtle/50 text-xs">
                 <div className="flex justify-between items-center text-text-secondary">
-                  <span>Next Flight NRT ➔ CGK</span>
+                  <span>{t('how.nextFlight')}</span>
                   <span className="font-price-md font-bold text-on-surface">28 Maret 2025</span>
                 </div>
                 <div className="flex justify-between items-center text-text-secondary">
-                  <span>Batas Submit Request</span>
+                  <span>{t('how.deadline')}</span>
                   <span className="font-semibold text-warning-text">26 Mar, 20:00 WIB</span>
                 </div>
               </div>
               <div className="flex items-center justify-between pt-1 text-xs">
                 <div className="flex items-center gap-1.5 text-text-secondary">
                   <span className="material-symbols-outlined text-primary-container text-[18px]">currency_yen</span>
-                  <span>Kurs Kunci Hari Ini:</span>
+                  <span>{t('how.rateToday')}</span>
                 </div>
                 <span className="font-price-md font-bold text-primary">
                   1 JPY = Rp {rate.toFixed(2)}
@@ -108,10 +110,10 @@ export const HowToShopPage: React.FC = () => {
               <span className="material-symbols-outlined text-[28px]">lock_reset</span>
             </div>
             <h3 className="font-title-md text-lg text-on-surface font-bold">
-              Transparansi Kurs Terkunci
+              {t('how.trust1Title')}
             </h3>
             <p className="text-sm text-text-secondary leading-relaxed">
-              Kurs yang disepakati saat Anda mentransfer DP adalah kurs final yang dikunci. Tidak ada biaya siluman karena fluktuasi mata uang Yen.
+              {t('how.trust1Desc')}
             </p>
           </div>
 
@@ -120,10 +122,10 @@ export const HowToShopPage: React.FC = () => {
               <span className="material-symbols-outlined text-[28px]">receipt</span>
             </div>
             <h3 className="font-title-md text-lg text-on-surface font-bold">
-              Bukti Struk Pembelian Fisik
+              {t('how.trust2Title')}
             </h3>
             <p className="text-sm text-text-secondary leading-relaxed">
-              Setiap barang belanjaan selalu dilampirkan bukti register struk kasir asli toko Jepang, memastikan keaslian produk 100%.
+              {t('how.trust2Desc')}
             </p>
           </div>
 
@@ -132,10 +134,10 @@ export const HowToShopPage: React.FC = () => {
               <span className="material-symbols-outlined text-[28px]">package_2</span>
             </div>
             <h3 className="font-title-md text-lg text-on-surface font-bold">
-              Kemasan Standar Logistik Tokyo
+              {t('how.trust3Title')}
             </h3>
             <p className="text-sm text-text-secondary leading-relaxed">
-              Bubble wrap 3 lapis, pelindung sudut kotak figur (corner guard), serta penanganan khusus snack mudah hancur.
+              {t('how.trust3Desc')}
             </p>
           </div>
         </div>
@@ -147,13 +149,13 @@ export const HowToShopPage: React.FC = () => {
           <div className="space-y-1 text-center">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-light-blue text-primary text-xs font-semibold">
               <span className="material-symbols-outlined text-[15px]">radar</span>
-              Simulasi Pelacakan Pengiriman
+              {t('how.simBadge')}
             </div>
             <h2 className="font-headline-sm text-2xl text-on-surface font-bold">
-              Lacak Status Titipanmu Real-Time
+              {t('how.simTitle')}
             </h2>
             <p className="text-sm text-text-secondary">
-              Ketikkan nomor invoice / nomor pesanan titipanmu (misal: <code>MPJ-48-901</code>)
+              {t('how.simDesc')}
             </p>
           </div>
 
@@ -162,15 +164,15 @@ export const HowToShopPage: React.FC = () => {
               type="text"
               value={trackNumber}
               onChange={(e) => setTrackNumber(e.target.value)}
-              placeholder="Masukkan No. Resi atau ID Titipan (mis: MPJ-48-901)"
+              placeholder={t('how.simPlaceholder')}
               className="flex-1 px-4 py-3.5 bg-surface-container-low rounded-xl text-on-surface font-body-md focus:outline-none focus:ring-2 focus:ring-primary border border-border-subtle/50"
             />
             <button
               type="submit"
-              className="px-6 py-3.5 bg-primary-container text-white font-label-md rounded-xl hover:bg-primary-dark transition-colors shadow-sm font-semibold flex items-center justify-center gap-2"
+              className="px-6 py-3.5 bg-primary-container text-white font-label-md rounded-xl hover:bg-primary-dark transition-colors shadow-sm font-semibold flex items-center justify-center gap-2 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[20px]">search</span>
-              <span>Cek Status</span>
+              <span>{t('how.simBtn')}</span>
             </button>
           </form>
 
@@ -193,10 +195,10 @@ export const HowToShopPage: React.FC = () => {
         <div className="bg-gradient-to-r from-surface-light-blue to-surface-container-highest p-8 rounded-3xl border border-border-subtle flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-1">
             <h3 className="font-headline-sm text-xl text-on-surface font-bold">
-              Sudah Siap Menitip Barang Impianmu?
+              {t('how.readyTitle')}
             </h3>
             <p className="text-sm text-text-secondary">
-              Konsultasikan langsung dengan shopper kami di Tokyo secara gratis.
+              {t('how.readyDesc')}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -204,7 +206,7 @@ export const HowToShopPage: React.FC = () => {
               to="/estimasi"
               className="px-5 py-3 bg-surface-container-lowest text-primary rounded-xl font-label-md hover:bg-white transition-all border border-border-subtle font-semibold shadow-xs"
             >
-              Kalkulator Biaya
+              {t('how.readyCalc')}
             </Link>
             <a
               href={generateGeneralConsultationUrl()}
@@ -212,7 +214,7 @@ export const HowToShopPage: React.FC = () => {
               rel="noreferrer"
               className="px-5 py-3 bg-primary-container text-white rounded-xl font-label-md hover:bg-primary-dark transition-all shadow-sm font-semibold flex items-center gap-2"
             >
-              <span>Hubungi Shopper</span>
+              <span>{t('how.readyContact')}</span>
               <span className="material-symbols-outlined text-[18px]">chat</span>
             </a>
           </div>

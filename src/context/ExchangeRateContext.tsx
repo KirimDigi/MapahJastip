@@ -30,12 +30,14 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
     isLive: false,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [isManual, setIsManual] = useState(false);
 
   const loadRate = useCallback(async (forceFresh = false) => {
     setIsLoading(true);
     try {
-      const res = forceFresh ? await fetchLiveJpyToIdr() : await getExchangeRate();
+      const res = forceFresh ? await fetchLiveJpyToIdr() : await getExchangeRate(forceFresh);
       setData(res);
+      setIsManual(false);
     } catch (err) {
       console.error('Failed to get exchange rate:', err);
     } finally {
@@ -44,14 +46,36 @@ export const ExchangeRateProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, []);
 
   useEffect(() => {
+    // Initial fetch saat aplikasi dimuat
     loadRate(false);
-  }, [loadRate]);
+
+    // Auto-refresh tiap 1 menit (60 detik)
+    const interval = setInterval(() => {
+      if (!isManual) {
+        loadRate(true);
+      }
+    }, 60 * 1000);
+
+    // Refresh otomatis ketika user kembali membuka tab browser
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !isManual) {
+        loadRate(true);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [loadRate, isManual]);
 
   const refetch = useCallback(async () => {
     await loadRate(true);
   }, [loadRate]);
 
   const setCustomRate = useCallback((customRate: number) => {
+    setIsManual(true);
     setData({
       rate: Math.round(customRate * 100) / 100,
       lastUpdated: new Date().toLocaleTimeString('id-ID') + ' WIB (Manual)',

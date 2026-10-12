@@ -23,6 +23,7 @@ export interface Order {
   subtotalIdr: number;
   jastipFeeIdr: number;
   shippingCostIdr: number;
+  customsTaxIdr?: number;
   totalAmountIdr: number;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;

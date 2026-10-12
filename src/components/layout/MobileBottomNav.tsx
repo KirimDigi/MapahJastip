@@ -1,25 +1,29 @@
-import React, { useState } from 'react';
-import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
-import { CATALOG_CATEGORY_FILTERS } from '../../constants/categories';
+import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
+import { LanguageSelector } from '../common/LanguageSelector';
 
 export const MobileBottomNav: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const { t, language } = useLanguage();
+  const { user, isLoggedIn } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const navLinks = [
-    { to: '/', label: 'Beranda' },
-    { to: '/katalog', label: 'Produk' },
-    { to: '/cara-kerja', label: 'Cara Kerja' },
-    { to: '/estimasi', label: 'Estimasi Biaya' },
-    { to: '/live-belanja', label: 'Live Belanja Jepang' },
-    { to: '/testimoni', label: 'Testimoni' },
-    { to: '/status-pesanan', label: 'Status Pesanan' },
+    { to: '/', label: t('nav.home') },
+    { to: '/katalog', label: t('nav.products') },
+    { to: '/cara-kerja', label: t('nav.howItWorks') },
+    { to: '/jadwal-penerbangan', label: t('nav.flightSchedule') },
+    { to: '/estimasi', label: t('nav.costEstimator') },
+    { to: '/testimoni', label: t('nav.testimonials') },
+    { to: '/faq', label: t('nav.faq') },
+    { to: '/status-pesanan', label: t('nav.orderStatus') },
   ];
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -39,19 +43,48 @@ export const MobileBottomNav: React.FC = () => {
     return location.pathname === path;
   };
 
+  const getTabHowItWorksLabel = () => {
+    if (language === 'ja') return '利用案内';
+    if (language === 'en') return 'Cara Kerja';
+    return 'Cara Kerja';
+  };
+
+  const getTabEstimasiLabel = () => {
+    if (language === 'ja') return '見積もり';
+    if (language === 'en') return 'Estimator';
+    return 'Estimasi';
+  };
+
+  useEffect(() => {
+    const handleOpenMenu = () => setIsMenuOpen(true);
+    const handleCloseMenu = () => setIsMenuOpen(false);
+    const handleToggleMenu = () => setIsMenuOpen((prev) => !prev);
+    window.addEventListener('open-mobile-menu', handleOpenMenu);
+    window.addEventListener('close-mobile-menu', handleCloseMenu);
+    window.addEventListener('toggle-mobile-menu', handleToggleMenu);
+    return () => {
+      window.removeEventListener('open-mobile-menu', handleOpenMenu);
+      window.removeEventListener('close-mobile-menu', handleCloseMenu);
+      window.removeEventListener('toggle-mobile-menu', handleToggleMenu);
+    };
+  }, []);
+
   return (
     <>
-      {/* 1. FIXED BOTTOM NAVIGATION BAR */}
+      {/* 1. FIXED BOTTOM NAVIGATION BAR (RAPI, SEJAJAR & TANPA OUTLINE) */}
       <nav
         aria-label="Navigasi Bawah Mobile"
-        className="xl:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-xl border-t border-border-subtle shadow-[0_-4px_24px_rgba(0,0,0,0.08)] safe-area-bottom"
+        className="xl:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-xl border-t border-border-subtle shadow-[0_-4px_24px_rgba(0,0,0,0.08)] safe-area-bottom select-none"
       >
         <div className="grid grid-cols-5 h-16 items-center px-1">
-          {/* Tab 1: Beranda */}
+          {/* Tab 1: Home */}
           <NavLink
             to="/"
-            onClick={() => setIsMenuOpen(false)}
-            className="flex flex-col items-center justify-center py-1 transition-all"
+            onClick={() => {
+              setIsMenuOpen(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="h-full flex flex-col items-center justify-center py-1 transition-all outline-none focus:outline-none focus:ring-0 active:outline-none border-none ring-0 select-none"
           >
             {() => {
               const active = isCurrentActive('/') && !isMenuOpen;
@@ -67,22 +100,25 @@ export const MobileBottomNav: React.FC = () => {
                     </svg>
                   </div>
                   <span
-                    className={`text-[11px] font-semibold leading-tight mt-0.5 ${
+                    className={`text-[10px] sm:text-[11px] font-semibold leading-none mt-1 text-center whitespace-nowrap truncate max-w-full px-0.5 ${
                       active ? 'text-primary' : 'text-text-secondary'
                     }`}
                   >
-                    Beranda
+                    {t('nav.home')}
                   </span>
                 </>
               );
             }}
           </NavLink>
 
-          {/* Tab 2: Produk */}
+          {/* Tab 2: Products */}
           <NavLink
             to="/katalog"
-            onClick={() => setIsMenuOpen(false)}
-            className="flex flex-col items-center justify-center py-1 transition-all"
+            onClick={() => {
+              setIsMenuOpen(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="h-full flex flex-col items-center justify-center py-1 transition-all outline-none focus:outline-none focus:ring-0 active:outline-none border-none ring-0 select-none"
           >
             {() => {
               const active = isCurrentActive('/katalog') && !isMenuOpen;
@@ -98,22 +134,25 @@ export const MobileBottomNav: React.FC = () => {
                     </svg>
                   </div>
                   <span
-                    className={`text-[11px] font-semibold leading-tight mt-0.5 ${
+                    className={`text-[10px] sm:text-[11px] font-semibold leading-none mt-1 text-center whitespace-nowrap truncate max-w-full px-0.5 ${
                       active ? 'text-primary' : 'text-text-secondary'
                     }`}
                   >
-                    Produk
+                    {t('nav.products')}
                   </span>
                 </>
               );
             }}
           </NavLink>
 
-          {/* Tab 3: Cara Kerja */}
+          {/* Tab 3: How It Works */}
           <NavLink
             to="/cara-kerja"
-            onClick={() => setIsMenuOpen(false)}
-            className="flex flex-col items-center justify-center py-1 transition-all"
+            onClick={() => {
+              setIsMenuOpen(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="h-full flex flex-col items-center justify-center py-1 transition-all outline-none focus:outline-none focus:ring-0 active:outline-none border-none ring-0 select-none"
           >
             {() => {
               const active = isCurrentActive('/cara-kerja') && !isMenuOpen;
@@ -129,22 +168,25 @@ export const MobileBottomNav: React.FC = () => {
                     </svg>
                   </div>
                   <span
-                    className={`text-[11px] font-semibold leading-tight mt-0.5 ${
+                    className={`text-[10px] sm:text-[11px] font-semibold leading-none mt-1 text-center whitespace-nowrap truncate max-w-full px-0.5 ${
                       active ? 'text-primary' : 'text-text-secondary'
                     }`}
                   >
-                    Cara Kerja
+                    {getTabHowItWorksLabel()}
                   </span>
                 </>
               );
             }}
           </NavLink>
 
-          {/* Tab 4: Estimasi */}
+          {/* Tab 4: Cost Estimator */}
           <NavLink
             to="/estimasi"
-            onClick={() => setIsMenuOpen(false)}
-            className="flex flex-col items-center justify-center py-1 transition-all"
+            onClick={() => {
+              setIsMenuOpen(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="h-full flex flex-col items-center justify-center py-1 transition-all outline-none focus:outline-none focus:ring-0 active:outline-none border-none ring-0 select-none"
           >
             {() => {
               const active = isCurrentActive('/estimasi') && !isMenuOpen;
@@ -160,82 +202,82 @@ export const MobileBottomNav: React.FC = () => {
                     </svg>
                   </div>
                   <span
-                    className={`text-[11px] font-semibold leading-tight mt-0.5 ${
+                    className={`text-[10px] sm:text-[11px] font-semibold leading-none mt-1 text-center whitespace-nowrap truncate max-w-full px-0.5 ${
                       active ? 'text-primary' : 'text-text-secondary'
                     }`}
                   >
-                    Estimasi
+                    {getTabEstimasiLabel()}
                   </span>
                 </>
               );
             }}
           </NavLink>
 
-          {/* Tab 5: Menu (Buka Bottom Sheet) */}
-          <button
-            type="button"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="flex flex-col items-center justify-center py-1 transition-all cursor-pointer focus:outline-none"
-            aria-label={isMenuOpen ? 'Tutup Menu' : 'Buka Menu Lengkap'}
+          {/* Tab 5: Akun / Masuk (Pojok Kanan Bawah Menggantikan Posisi Menu) */}
+          <NavLink
+            to="/masuk"
+            onClick={() => {
+              setIsMenuOpen(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="h-full flex flex-col items-center justify-center py-1 transition-all outline-none focus:outline-none focus:ring-0 active:outline-none border-none ring-0 select-none"
           >
-            <div
-              className={`flex items-center justify-center w-11 h-7 rounded-full transition-all ${
-                isMenuOpen || ['/live-belanja', '/testimoni', '/status-pesanan'].includes(location.pathname)
-                  ? 'bg-surface-light-blue text-primary'
-                  : 'text-text-secondary'
-              }`}
-            >
-              {isMenuOpen ? (
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                  <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" />
-                </svg>
-              )}
-            </div>
-            <span
-              className={`text-[11px] font-semibold leading-tight mt-0.5 ${
-                isMenuOpen || ['/live-belanja', '/testimoni', '/status-pesanan'].includes(location.pathname)
-                  ? 'text-primary'
-                  : 'text-text-secondary'
-              }`}
-            >
-              {isMenuOpen ? 'Tutup' : 'Menu'}
-            </span>
-          </button>
+            {() => {
+              const active = ['/masuk', '/login', '/daftar', '/register'].includes(location.pathname) && !isMenuOpen;
+              return (
+                <>
+                  <div
+                    className={`flex items-center justify-center w-11 h-7 rounded-full transition-all ${
+                      active ? 'bg-surface-light-blue text-primary' : 'text-text-secondary'
+                    }`}
+                  >
+                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                  </div>
+                  <span
+                    className={`text-[10px] sm:text-[11px] font-semibold leading-none mt-1 text-center whitespace-nowrap truncate max-w-full px-0.5 ${
+                      active ? 'text-primary' : 'text-text-secondary'
+                    }`}
+                  >
+                    {isLoggedIn ? (user?.name?.split(' ')[0] || t('header.myAccount')) : (language === 'ja' ? 'アカウント' : language === 'en' ? 'Account' : 'Akun')}
+                  </span>
+                </>
+              );
+            }}
+          </NavLink>
         </div>
       </nav>
 
-      {/* 2. MOBILE BOTTOM SHEET DRAWER */}
+      {/* 2. MOBILE LEFT SIDEBAR DRAWER */}
       {isMenuOpen && (
-        <div className="xl:hidden fixed inset-0 z-50 flex flex-col justify-end">
+        <div className="xl:hidden fixed inset-0 z-[100] flex justify-start">
           {/* Backdrop */}
           <div
             onClick={() => setIsMenuOpen(false)}
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-fadeIn cursor-pointer"
           />
 
-          {/* Drawer Content */}
-          <div className="relative z-10 w-full max-h-[82vh] bg-surface-container-lowest rounded-t-3xl border-t border-border-subtle shadow-2xl p-5 pb-8 flex flex-col space-y-4 animate-slide-up overflow-y-auto safe-area-bottom">
-            {/* Grab handle bar */}
-            <div className="w-12 h-1.5 bg-border-subtle rounded-full mx-auto -mt-1 mb-1" />
+          {/* Left Drawer Content */}
+          <div className="relative z-10 w-[84vw] max-w-[320px] h-full bg-surface-container-lowest rounded-r-2xl sm:rounded-r-3xl border-r border-border-subtle shadow-2xl p-5 pb-8 flex flex-col space-y-4 animate-slide-left overflow-y-auto safe-area-bottom">
 
             {/* Header */}
             <div className="flex items-center justify-between pb-2.5 border-b border-border-subtle/70">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-base text-on-surface">Menu Navigasi MapahJastip</span>
+                <span className="font-bold text-base text-on-surface">{t('mob.menuTitle')}</span>
               </div>
-              <button
-                onClick={() => setIsMenuOpen(false)}
-                className="p-1.5 rounded-full hover:bg-surface-container-low text-text-secondary hover:text-on-surface cursor-pointer"
-                aria-label="Tutup Menu"
-              >
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-                </svg>
-              </button>
+              <div className="flex items-center gap-2">
+                <LanguageSelector variant="compact" />
+                <button
+                  onClick={() => setIsMenuOpen(false)}
+                  className="p-1.5 rounded-full hover:bg-surface-container-low text-text-secondary hover:text-on-surface cursor-pointer"
+                  aria-label={t('mob.close')}
+                >
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                  </svg>
+                </button>
+              </div>
             </div>
 
             {/* Mobile Search Form - Capsule Pill Style */}
@@ -250,7 +292,7 @@ export const MobileBottomNav: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Cari produk, merek, atau kata kunci..."
+                  placeholder={t('cat.searchPlaceholder')}
                   className="flex-1 min-w-0 px-2 py-2.5 bg-transparent text-on-surface text-sm placeholder:text-slate-400 dark:placeholder:text-text-secondary focus:outline-none font-medium"
                 />
                 {searchQuery && (
@@ -258,7 +300,7 @@ export const MobileBottomNav: React.FC = () => {
                     type="button"
                     onClick={() => setSearchQuery('')}
                     className="flex items-center text-slate-400 hover:text-on-surface px-2 transition-colors cursor-pointer"
-                    aria-label="Hapus kata kunci"
+                    aria-label={t('cat.clearSearch')}
                   >
                     <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                       <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
@@ -267,11 +309,11 @@ export const MobileBottomNav: React.FC = () => {
                 )}
                 <button
                   type="submit"
-                  aria-label="Cari"
+                  aria-label={t('cat.searchBtn')}
                   className="bg-primary hover:bg-primary-dark text-white px-4 rounded-r-full flex items-center justify-center transition-colors cursor-pointer shrink-0"
                 >
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 11.99 14 9.5 14z" />
                   </svg>
                 </button>
               </div>
@@ -282,76 +324,21 @@ export const MobileBottomNav: React.FC = () => {
               {navLinks.map((link) => {
                 const isActive = isCurrentActive(link.to);
 
-                if (link.to === '/katalog') {
-                  return (
-                    <div key={link.to} className="space-y-1">
-                      <div className="flex items-center justify-between rounded-xl">
-                        <NavLink
-                          to={link.to}
-                          onClick={() => setIsMenuOpen(false)}
-                          className={`flex-1 px-4 py-2.5 rounded-l-xl text-sm font-semibold transition-all flex items-center gap-3 ${
-                            isActive
-                              ? 'bg-surface-light-blue text-primary'
-                              : 'text-on-surface-variant hover:bg-surface-soft-blue'
-                          }`}
-                        >
-                          <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
-                            <path d="M4 4h16l1.5 5.5v1.5h-.5a2.5 2.5 0 01-5 0H8a2.5 2.5 0 01-5 0H2.5V9.5L4 4zm1 9v7h14v-7a4.5 4.5 0 01-3 1.1 4.5 4.5 0 01-4-2.1 4.5 4.5 0 01-4 2.1 4.5 4.5 0 01-3-1.1z" />
-                          </svg>
-                          <span>{link.label}</span>
-                        </NavLink>
-                        <button
-                          onClick={() => setIsProductsDropdownOpen(!isProductsDropdownOpen)}
-                          className="px-3 py-2.5 text-text-secondary hover:text-primary rounded-r-xl hover:bg-surface-soft-blue cursor-pointer"
-                          aria-label="Buka Kategori Produk"
-                        >
-                          <svg
-                            className={`w-5 h-5 fill-current transition-transform duration-200 ${
-                              isProductsDropdownOpen ? 'rotate-180' : ''
-                            }`}
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M7 10l5 5 5-5z" />
-                          </svg>
-                        </button>
-                      </div>
-
-                      {isProductsDropdownOpen && (
-                        <div className="pl-3 pr-1 py-1.5 grid grid-cols-2 gap-1 bg-surface-container-low/50 rounded-xl">
-                          {CATALOG_CATEGORY_FILTERS.map((cat) => (
-                            <Link
-                              key={cat.id}
-                              to={cat.id === 'semua' ? '/katalog' : `/katalog?kategori=${cat.id}`}
-                              onClick={() => setIsMenuOpen(false)}
-                              className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs text-on-surface hover:text-primary hover:bg-surface-light-blue transition-colors"
-                            >
-                              <span className="material-symbols-outlined text-[16px] text-text-secondary">
-                                {cat.icon}
-                              </span>
-                              <span className="truncate">{cat.label}</span>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-
                 return (
                   <NavLink
                     key={link.to}
                     to={link.to}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-between ${
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center ${
                       isActive
                         ? 'bg-surface-light-blue text-primary'
                         : 'text-on-surface-variant hover:bg-surface-soft-blue'
                     }`}
                   >
                     <span>{link.label}</span>
-                    <svg className="w-4 h-4 fill-current text-text-secondary" viewBox="0 0 24 24">
-                      <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
-                    </svg>
                   </NavLink>
                 );
               })}

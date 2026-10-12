@@ -17,4 +17,6 @@ export interface CartContextType {
   totalPriceIdr: number;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
+  lastAddedItem: CartItem | null;
+  clearNotification: () => void;
 }

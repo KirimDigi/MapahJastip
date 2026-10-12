@@ -53,11 +53,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               onChange={(e) => onSortChange(e.target.value)}
               className="w-full appearance-none bg-surface-container-low py-3 pl-4 pr-10 rounded-xl font-label-md text-label-md text-on-surface border border-transparent focus:outline-none focus:ring-2 focus:ring-primary-container cursor-pointer"
             >
-              <option value="populer">Paling Banyak Dititip</option>
-              <option value="termurah">Harga: Terendah ke Tinggi</option>
-              <option value="tertinggi">Harga: Tertinggi ke Rendah</option>
-              <option value="rilis_baru">Baru Rilis di Jepang</option>
-              <option value="batch_dekat">Batch Terdekat (Prioritas)</option>
+              <option value="populer">Paling Populer</option>
+              <option value="harga-rendah">Harga: Rendah ke Tinggi</option>
+              <option value="harga-tinggi">Harga: Tinggi ke Rendah</option>
+              <option value="rating">Rating Tertinggi</option>
+              <option value="nama-az">Nama Produk (A-Z)</option>
             </select>
             <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary text-[20px]">
               expand_more

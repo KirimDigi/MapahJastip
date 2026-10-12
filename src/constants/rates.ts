@@ -7,32 +7,32 @@ export const CURRENT_EXCHANGE_RATE = 113.33; // 1 JPY = Rp 113.33
  * Mengacu pada standar pasaran riil Jastip Handcarry & Air Cargo Forwarder Indonesia-Jepang (All-in Cukai/Pajak)
  */
 
-// 1. Handcarry Koper Shopper (Bawa Langsung di Bagasi Pesawat, 3-5 Hari Kerja)
-// Standar pasaran jastip koper: Rp 280.000 / kg = Rp 28.000 / 100g
+// 1. EMS Japan Post Express (Pos Kilat Internasional Tokyo Direct, 3-5 Hari)
+// Standar resmi pos Jepang EMS: ~Rp 250.000 / kg = Rp 25.000 / 100g
+export const AIR_EXPRESS_RATE_PER_100G = 25000;
+
+// 2. Reguler Pos Udara Jepang (Air Parcel Tokyo Standard, 7-10 Hari)
+// Standar resmi pos udara reguler Jepang: ~Rp 165.000 / kg = Rp 16.500 / 100g
+export const AIR_REGULAR_RATE_PER_100G = 16500;
+
+// 3. Handcarry Koper Shopper (Bawa Langsung di Bagasi Pesawat, 3-5 Hari Kerja)
 export const HANDCARRY_RATE_PER_100G = 28000;
 
-// 2. Air Cargo Terjadwal All-in (Kargo Udara Forwarder Resmi, 7-10 Hari Kerja)
-// Standar pasaran kargo udara all-in cukai: Rp 240.000 / kg = Rp 24.000 / 100g
+// 4. Air Cargo Terjadwal (Kargo Udara Forwarder Resmi, 7-10 Hari Kerja)
 export const CARGO_EXPRESS_RATE_PER_100G = 24000;
-
-// 3. Air Express / EMS Prioritas (Kargo Kilat Pesawat Udara Langsung, 3-5 Hari)
-// Standar pasaran prioritas: Rp 350.000 / kg = Rp 35.000 / 100g
-export const AIR_EXPRESS_RATE_PER_100G = 35000;
-
-// 4. Air Regular Konsolidasi (Penerbangan Standar Terjadwal, 10-14 Hari)
-// Standar pasaran konsolidasi: Rp 220.000 / kg = Rp 22.000 / 100g
-export const AIR_REGULAR_RATE_PER_100G = 22000;
 
 // Biaya Packing Ekstra (Kardus Double Wall Tebal + Corner Guard Pelindung Sudut Anti-Penyok)
 export const REINFORCED_BOX_FEE = 35000;
 
-// Tarif Kurir Domestik dari Hub Jakarta (Soekarno-Hatta) ke Alamat Tujuan di Indonesia
+// Tarif Kurir Domestik dari Hub Jakarta (Soekarno-Hatta) ke Alamat Tujuan di Indonesia (Standar Riil JNE / SiCepat / J&T / Paxel)
 export const DESTINATION_ZONES: DestinationZone[] = [
-  { id: 'jabodetabek', name: 'DKI Jakarta & Bodetabek (Paxel / JNE / SiCepat)', ratePerKg: 15000 },
-  { id: 'jabar', name: 'Jawa Barat & Banten (Bandung, Serang, dll)', ratePerKg: 20000 },
-  { id: 'jateng_diy', name: 'Jawa Tengah & D.I. Yogyakarta (Semarang, Solo, Jogja)', ratePerKg: 24000 },
-  { id: 'jatim', name: 'Jawa Timur & Bali (Surabaya, Malang, Denpasar)', ratePerKg: 28000 },
-  { id: 'luar_jawa', name: 'Luar Pulau Jawa (Sumatera, Kalimantan, Sulawesi, Papua)', ratePerKg: 45000 },
+  { id: 'jabodetabek', name: 'DKI Jakarta & Bodetabek (JNE / SiCepat / Paxel)', ratePerKg: 10000 },
+  { id: 'jabar', name: 'Jawa Barat & Banten (Bandung, Serang, dll)', ratePerKg: 15000 },
+  { id: 'jateng_diy', name: 'Jawa Tengah & D.I. Yogyakarta (Semarang, Solo, Jogja)', ratePerKg: 20000 },
+  { id: 'jatim_bali', name: 'Jawa Timur & Bali (Surabaya, Malang, Denpasar)', ratePerKg: 24000 },
+  { id: 'sumatera', name: 'Sumatera (Medan, Palembang, Lampung, Riau, dll)', ratePerKg: 38000 },
+  { id: 'kalimantan_sulawesi', name: 'Kalimantan & Sulawesi (Balikpapan, Makassar, Manado)', ratePerKg: 55000 },
+  { id: 'timur_papua', name: 'Indonesia Timur & Papua (Maluku, NTT, Jayapura, dll)', ratePerKg: 85000 },
 ];
 
 export const JAPAN_MERCHANTS = [
